@@ -1,0 +1,100 @@
+{
+  "products": [
+    {
+      "id": "whole-lechon",
+      "name": "Whole Lechon",
+      "weightBasis": "live weight",
+      "weightBasisLabel": "Priced by live weight",
+      "blurb": "For the big handaan. Slow-roasted over wood until the skin turns glassy.",
+      "description": "Whole pig, slow-roasted over wood coals until the skin crackles. Priced by live weight and roasted fresh for your date.",
+      "image": "whole-lechon-spit-roast.jpg",
+      "imageAlt": "Whole roast pig on the spit, skin crisped to a deep amber.",
+      "freebie": "Comes with free dinuguan",
+      "prefillKey": "whole",
+      "sizes": [
+        {
+          "weightKg": 20,
+          "weightLabel": "20 kg",
+          "servesMin": 20,
+          "servesMax": 30,
+          "servesLabel": "20–30 pax",
+          "price": 9000
+        },
+        {
+          "weightKg": 25,
+          "weightLabel": "25 kg",
+          "servesMin": 30,
+          "servesMax": 40,
+          "servesLabel": "30–40 pax",
+          "price": 10000
+        },
+        {
+          "weightKg": 30,
+          "weightLabel": "30 kg",
+          "servesMin": 40,
+          "servesMax": 50,
+          "servesLabel": "40–50 pax",
+          "price": 11000
+        },
+        {
+          "weightKg": 35,
+          "weightLabel": "35 kg",
+          "servesMin": 50,
+          "servesMax": 60,
+          "servesLabel": "50–60 pax",
+          "price": 12000
+        },
+        {
+          "weightKg": 40,
+          "weightLabel": "40 kg",
+          "servesMin": 60,
+          "servesMax": 70,
+          "servesLabel": "60–70 pax",
+          "price": 13000
+        }
+      ],
+      "imageFocus": "top"
+    },
+    {
+      "id": "lechon-belly",
+      "name": "Lechon Belly",
+      "weightBasis": "raw weight",
+      "weightBasisLabel": "Priced by raw weight",
+      "blurb": "Boneless, rolled, and easy to slice. Right-sized for smaller gatherings.",
+      "description": "Boneless pork belly, rolled and roasted until the skin blisters. Priced by raw weight and roasted fresh for your date.",
+      "image": "lechon-belly-banana-leaf.jpg",
+      "imageAlt": "Rolled lechon belly resting on a banana leaf, skin blistered and crisp.",
+      "freebie": null,
+      "prefillKey": "belly",
+      "sizes": [
+        {
+          "weightKg": 3,
+          "weightLabel": "3 kg",
+          "servesMin": 5,
+          "servesMax": 10,
+          "servesLabel": "5–10 pax",
+          "price": 2200
+        },
+        {
+          "weightKg": 4,
+          "weightLabel": "4 kg",
+          "servesMin": 10,
+          "servesMax": 15,
+          "servesLabel": "10–15 pax",
+          "price": 2600
+        },
+        {
+          "weightKg": 5,
+          "weightLabel": "5 kg",
+          "servesMin": 15,
+          "servesMax": 20,
+          "servesLabel": "15–20 pax",
+          "price": 3000
+        }
+      ],
+      "imageFocus": "center"
+    }
+  ],
+  "currency": "PHP",
+  "currencySymbol": "₱"
+}

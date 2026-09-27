@@ -1,0 +1,143 @@
+/* ==========================================================================
+   tokens.css — Alzar's Lechon Haus
+   Destination: src/styles/tokens.css
+
+   PALETTE: FIESTA — locked 2026-09-20.
+   Chosen over the "Hearth" earth-tone alternative because lechon is
+   occasion food: fiesta, Christmas, New Year, birthdays. The red is
+   doing semantic work, not just matching the existing price flyer.
+
+   Rules:
+   - Never hardcode a hex value in a component. Add a token here instead.
+   - The red ground and the photography are close in hue. Food photos
+     ALWAYS sit on --color-bg-alt (white) or --color-bg (cream) cards,
+     never directly on --color-bg-inverse. See DESIGN.md.
+
+   See DESIGN.md for rationale and the accessibility checklist.
+   ========================================================================== */
+
+:root {
+  /* ---- Surfaces ---- */
+  --color-bg:              #F7F0E4;  /* warm cream — page base */
+  --color-bg-alt:          #FFFFFF;  /* cards, raised surfaces, photo mounts */
+  --color-bg-sunken:       #EFE4D2;  /* toasted cream — a quiet grouping surface, one step below the page. Muted text 5.4:1 */
+  --color-bg-inverse:      #A31E22;  /* deep flyer red — hero, header, footer, feature bands */
+  --color-bg-inverse-deep: #7C1418;  /* darker red — final CTA, sticky order bar, overlays */
+
+  /* ---- Text ---- */
+  --color-text:            #2B1A16;  /* near-black, warm cast */
+  --color-text-muted:      #6B564F;
+  --color-text-inverse:    #FCEFD4;  /* cream on red */
+  --color-text-on-accent:  #2B1A16;  /* on gold fills */
+
+  /* ---- Accent (gold) ---- */
+  --color-accent:          #E8A33D;  /* flyer gold — fills, rules, buttons on red */
+  --color-accent-strong:   #C9801F;  /* hover/active fills. NOT for text: 2.8:1 on cream */
+  --color-accent-text:     #8A5410;  /* gold as text (eyebrows, links): 5.5:1 cream, 5.0:1 toasted */
+  --color-accent-soft:     #F6DFB4;  /* tints, table stripes, lead-time badge */
+
+  /* ---- Brand ---- */
+  --color-brand:           #A31E22;  /* flyer red as a foreground — the header wordmark. 6.7:1 on cream */
+
+  /* ---- Actions ---- */
+  --color-cta:             #A31E22;
+  --color-cta-hover:       #7C1418;
+  --color-cta-text:        #FCEFD4;
+
+  /* ---- Photo ground ---- */
+  /* Sampled from the hero photo's surface, which is lit from above: lighter
+     at the top, lightest at top centre. The hero's ground follows the same
+     falloff so the photo's faded edges disappear at every height. */
+  --color-photo-ground-light: #FBF2E9;  /* top centre — behind the phone bunting band */
+  --color-photo-ground-top:   #F8ECDE;  /* side edges, top */
+  --color-photo-ground-mid:   #F5E7D9;  /* side edges, mid-height */
+  --color-photo-ground:       #F4E7D7;  /* side edges, lower third to bottom */
+
+  /* ---- Lines ---- */
+  --color-border:          #E0D2BC;
+  --color-border-strong:   #C4AE90;
+
+  /* ---- Focus ---- */
+  --color-focus:           #1F6FEB;  /* deliberately non-brand so it reads on red AND cream */
+
+  /* ---- Decorative (banderitas only) ---- */
+  --color-deco-1:          #E8A33D;  /* gold */
+  --color-deco-2:          #D94A3D;  /* warm red-orange */
+  --color-deco-3:          #3E7CA8;  /* blue — the flyer's third bunting color */
+  --color-deco-4:          #FCEFD4;  /* cream — stands in for red-orange on red grounds */
+
+  /* ---- Surface pair ----
+     What a component sits on, and the one step off it for anything it
+     raises or insets (cards, size buttons, switch tracks). .band--sunken
+     swaps the pair, so a component placed on a toasted band inverts
+     instead of disappearing into it. Components use these, not the raw
+     bg tokens, for their own fills. */
+  --surface:   var(--color-bg);
+  --surface-2: var(--color-bg-sunken);
+
+  /* ---- Type families ---- */
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* ---- Type scale — fluid, mobile-first. 16px minimum body. ---- */
+  --text-xs:   0.8125rem;
+  --text-sm:   0.9375rem;
+  --text-base: 1rem;
+  --text-lg:   clamp(1.125rem, 1rem + 0.5vw, 1.25rem);
+  --text-xl:   clamp(1.375rem, 1.1rem + 1.2vw, 1.75rem);
+  --text-2xl:  clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+  --text-3xl:  clamp(2.25rem, 1.5rem + 3.2vw, 3.75rem);
+
+  --leading-tight:  1.15;
+  --leading-normal: 1.6;
+
+  --tracking-display: 0.06em; /* flyer uses wide-tracked caps */
+  --tracking-normal:  0;
+
+  --weight-normal:  400;
+  --weight-medium:  500;
+  --weight-bold:    700;
+  --weight-black:   800;
+
+  /* ---- Spacing — 4px base ---- */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* ---- Layout ---- */
+  --section-y:   clamp(3rem, 8vw, 6rem);
+  --gutter:      clamp(1rem, 5vw, 2rem);
+  --content-max: 68rem;
+  --prose-max:   38rem;
+  --header-h:    4rem;  /* site header min height; the full-height hero subtracts it */
+
+  /* ---- Radii ---- */
+  --radius-sm: 4px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  /* ---- Elevation ---- */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
+  --shadow-md: 0 4px 16px rgb(0 0 0 / 0.10);
+  --shadow-lg: 0 12px 36px rgb(0 0 0 / 0.14);
+
+  /* ---- Motion ---- */
+  --transition: 160ms ease;
+
+  /* ---- Touch targets — PH mobile-first audience ---- */
+  --tap-min: 44px;
+
+  /* ---- Sticky mobile order bar ---- */
+  --order-bar-h: 64px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --transition: 0ms; }
+}

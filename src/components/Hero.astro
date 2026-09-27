@@ -1,0 +1,331 @@
+---
+import { Image } from 'astro:assets';
+import site from '../data/site.json';
+import { img } from '../lib/images';
+import { peso, startingPrice, product } from '../lib/format';
+import Banderitas from './Banderitas.astro';
+
+// Food-first hero: a top-down shot on its own cream surface, shown
+// unfiltered. It needs generous, evenly lit margins around the subject —
+// see the images README.
+const heroImage = img('lechon-belly-bilao-top-down.jpg');
+
+// Every figure below comes from the data files; nothing is typed here.
+const offers = ['lechon-belly', 'whole-lechon'].map((id) => {
+  const p = product(id);
+  return { name: p.name, from: peso(startingPrice(p.sizes)), basis: p.weightBasisLabel };
+});
+---
+
+<section class="hero">
+  {/*
+    Food-first, in the Fiesta palette: the dish centred on the photo's own
+    cream surface, the corner swags framing it from the top corners.
+
+    Desktop: the dish is flanked by the two things a first-time visitor
+    needs — what this is (tagline and one line of description, left) and
+    what it costs and how ordering works (from-prices by weight basis, the
+    lead time, free delivery, right). Both blocks hug the dish. The
+    header's Order button stays the one primary CTA on the first screen;
+    this side puts the lead time on the same screen as it (CLAUDE.md).
+
+    Tablets: the dish, then the same two blocks side by side, meeting on
+    the dish's centre line. Phones: one centred column — dish, headline,
+    description, the two prices side by side, then the terms.
+
+    The h1 is the visible tagline, with the business name inside it for
+    search engines and screen readers.
+  */}
+  <Banderitas variant="swags" tone="light" />
+  <Image
+    src={heroImage}
+    alt="Lechon belly roll on a woven bilao lined with banana leaf, its crackling skin blistered gold, with two slices cut to show the herb-stuffed spiral inside."
+    widths={[640, 960, 1376, 1920]}
+    sizes="(min-width: 64em) 75vw, 190vw"
+    format="webp"
+    loading="eager"
+    fetchpriority="high"
+    class="hero__img"
+  />
+
+  <div class="hero__side hero__side--what">
+    <h1 class="hero__h1">
+      <span class="visually-hidden">{site.name} — </span>{site.tagline}
+    </h1>
+    <p class="hero__desc">{site.shortDescription}</p>
+  </div>
+
+  <div class="hero__side hero__side--how">
+    <ul class="hero__offers" role="list">
+      {offers.map((o) => (
+        <li>
+          <span class="hero__offer-name">{o.name}</span>
+          <span class="hero__offer-price">from {o.from}</span>
+          <span class="hero__offer-basis">{o.basis}</span>
+        </li>
+      ))}
+    </ul>
+    <ul class="hero__terms" role="list">
+      <li>{site.ordering.leadTime}</li>
+      <li>{site.delivery.short}</li>
+    </ul>
+    <a class="hero__link" href="/menu">See all prices <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<style>
+  /* The photo's surface is an even cream, but lit from above: lighter at
+     the top, lightest at top centre, #F4E7D7 from the lower third down. The
+     hero's ground follows that falloff (the --color-photo-ground-* tokens
+     are sampled from it), so wherever the photo's edges fade out, the
+     ground behind them is the same colour. A flat ground only matches at
+     one height and shows the rest of the photo as a faint box.
+
+     The photo file is extended downward (see the images README) so the
+     bilao's shadow finishes inside it instead of being cut off by the
+     frame. Geometry of that file, used below: the bilao spans 77% of its
+     height, centred 44% down. */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-top: var(--bunting-drop, 0px);
+    background: linear-gradient(
+      to bottom,
+      var(--color-photo-ground-light) 0 20%,
+      var(--color-photo-ground-mid) 50%,
+      var(--color-photo-ground) 78%,
+      var(--color-bg)
+    );
+  }
+
+  /* ---- Phones: one centred column on the dish's axis ----
+     Same content and hierarchy as desktop, stacked: dish, headline and
+     description, then prices side by side, then the terms under a short
+     rule. Centred, like the dish and the header's wordmark above it. */
+  .hero {
+    --img-h: min(100vw, 56svh);
+  }
+  .hero :global(.hero__img) {
+    position: relative;
+    display: block;
+    left: 50%;
+    height: var(--img-h);
+    width: auto;
+    max-width: none;
+    aspect-ratio: 2752 / 1816;
+    transform: translateX(-50%);
+    /* The bottom ~12% of the file is the shadow's tail — pull the copy up
+       over it so the dish and its headline read as one group. */
+    margin-bottom: calc(var(--img-h) * -0.1);
+    /* All four edges fade: whenever the screen is wider than the photo
+       (tablets, landscape phones) its sides would otherwise show. */
+    -webkit-mask-image:
+      linear-gradient(to right, transparent, black 10%, black 90%, transparent),
+      linear-gradient(to bottom, transparent, black 5%, black 94%, transparent);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent, black 10%, black 90%, transparent),
+      linear-gradient(to bottom, transparent, black 5%, black 94%, transparent);
+    mask-composite: intersect;
+  }
+
+  .hero__side {
+    position: relative;
+    max-width: 30rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    text-align: center;
+  }
+  .hero__side--how { margin-top: var(--space-8); padding-bottom: var(--space-12); }
+
+  .hero__h1 {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: var(--weight-medium);
+    font-size: clamp(1.75rem, 7.2vw, 2.25rem);
+    line-height: var(--leading-tight);
+    color: var(--color-brand);
+    max-width: 16ch;
+    margin-inline: auto;
+    text-wrap: balance;
+  }
+  .hero__desc {
+    margin: var(--space-3) auto 0;
+    color: var(--color-text-muted);
+    max-width: 32ch;
+  }
+
+  /* Two offers side by side, split by a hairline. */
+  .hero__offers {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .hero__offers li {
+    display: grid;
+    align-content: start;
+    gap: 0.1rem;
+    padding-inline: var(--space-3);
+  }
+  .hero__offers li + li { border-left: 1px solid var(--color-border); }
+  .hero__offer-name {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-base);
+    color: var(--color-text);
+  }
+  .hero__offer-price {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.1;
+    color: var(--color-brand);
+  }
+  .hero__offer-basis {
+    margin-top: 0.15rem;
+    font-size: 0.6875rem;
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    text-wrap: balance;
+  }
+
+  /* Terms under a short rule, as on desktop. */
+  .hero__terms {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    width: min(100%, 20rem);
+    margin: var(--space-6) auto 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    text-wrap: balance;
+  }
+  .hero__terms li { text-wrap: balance; }
+
+  .hero__link {
+    display: inline-block;
+    margin-top: var(--space-4);
+    font-weight: var(--weight-bold);
+    color: var(--color-brand);
+    text-underline-offset: 4px;
+  }
+  .hero__link:hover { text-decoration-thickness: 2px; }
+
+  /* ---- Tablets: dish, then the desktop's two blocks side by side ----
+     The two blocks meet on the dish's centre line — headline block
+     right-aligned towards it, prices block left-aligned away from it,
+     a hairline between — so the tablet reads as the desktop folded under
+     the dish rather than as a stretched phone. */
+  @media (min-width: 45em) and (max-width: 63.999em) {
+    .hero {
+      --img-h: min(78vw, 50svh);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding-bottom: var(--space-16);
+    }
+    .hero :global(.hero__img) { grid-column: 1 / -1; justify-self: start; }
+    .hero__side {
+      max-width: 24rem;
+      margin: 0;
+      padding: 0;
+    }
+    .hero__side--what {
+      justify-self: end;
+      text-align: right;
+      padding-right: var(--space-8);
+    }
+    .hero__side--what .hero__h1,
+    .hero__side--what .hero__desc { margin-right: 0; margin-left: auto; }
+    .hero__side--how {
+      justify-self: start;
+      text-align: left;
+      padding-left: var(--space-8);
+      border-left: 1px solid var(--color-border);
+    }
+    .hero__h1 { font-size: clamp(1.875rem, 4vw, 2.25rem); max-width: none; }
+    .hero__offers { display: block; }
+    .hero__offers li { padding: 0; }
+    .hero__offers li + li { border: 0; margin-top: var(--space-4); }
+    .hero__offer-name { font-size: var(--text-lg); }
+    .hero__offer-basis { font-size: var(--text-xs); letter-spacing: 0.12em; }
+    .hero__terms { align-items: flex-start; width: auto; margin-left: 0; }
+  }
+
+  /* ---- Desktop: copy | dish | prices & terms ----
+     The dish is sized by the hero's height (60% of it). The two copy
+     blocks hug it from either side, a fixed gap away, vertically centred
+     on it, and never run past an 80rem-wide frame. */
+  @media (min-width: 64em) {
+    .hero {
+      /* Capped at 62vw so a tall screen (a portrait iPad Pro, a tall
+         browser window) can't grow the dish until it squeezes the two
+         copy columns to a word per line. */
+      --hero-h: min(calc(100vh - var(--header-h)), 62vw);
+      --hero-h: min(calc(100svh - var(--header-h)), 62vw);
+      --dish: calc(var(--hero-h) * 0.6);
+      --img-h: calc(var(--dish) / 0.77);
+      --dish-y: 54%;
+      --frame: max(var(--gutter), calc(50% - 40rem + var(--gutter)));
+      --gap: var(--space-12);
+      --side-w: min(22rem, calc(50% - var(--dish) / 2 - var(--gap) - var(--frame)));
+      height: var(--hero-h);
+      padding-top: 0;
+      background: linear-gradient(
+        to bottom,
+        var(--color-photo-ground-light) 0 18%,
+        var(--color-photo-ground-mid) 48%,
+        var(--color-photo-ground) 78% 95%,
+        var(--color-bg)
+      );
+    }
+    .hero :global(.hero__img) {
+      position: absolute;
+      top: calc(var(--dish-y) - var(--img-h) * 0.44);
+      height: var(--img-h);
+      margin: 0;
+      -webkit-mask-image:
+        linear-gradient(to right, transparent, black 10%, black 90%, transparent),
+        linear-gradient(to bottom, transparent, black 6%, black 95%, transparent);
+      -webkit-mask-composite: source-in;
+      mask-image:
+        linear-gradient(to right, transparent, black 10%, black 90%, transparent),
+        linear-gradient(to bottom, transparent, black 6%, black 95%, transparent);
+      mask-composite: intersect;
+    }
+
+    .hero__side {
+      position: absolute;
+      top: var(--dish-y);
+      width: var(--side-w);
+      max-width: none;
+      margin: 0;
+      padding: 0;
+      transform: translateY(-50%);
+    }
+    .hero__side--what {
+      right: calc(50% + var(--dish) / 2 + var(--gap));
+      text-align: right;
+    }
+    .hero__side--what .hero__h1,
+    .hero__side--what .hero__desc { margin-left: auto; }
+    .hero__side--how { left: calc(50% + var(--dish) / 2 + var(--gap)); }
+
+    /* Sized to the column, not the type scale: about three lines beside
+       the dish, never heavier than it. */
+    .hero__h1 { font-size: clamp(2rem, 2.5vw, 2.75rem); max-width: none; }
+    .hero__side--how { text-align: left; }
+    .hero__side--what .hero__desc { margin-right: 0; }
+    .hero__offers li { padding: 0; }
+    .hero__offers li + li { border: 0; margin-top: var(--space-4); }
+    .hero__offer-name { font-size: var(--text-lg); }
+    .hero__offer-basis { font-size: var(--text-xs); letter-spacing: 0.12em; }
+    .hero__offers { display: block; }
+    .hero__terms { align-items: flex-start; width: auto; }
+  }
+</style>

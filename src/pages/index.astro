@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import { localBusinessSchema } from '../lib/schema';
+import site from '../data/site.json';
+import { peso, startingPrice, product } from '../lib/format';
+
+const whole = product('whole-lechon');
+const belly = product('lechon-belly');
+const description = `Wood-fired whole lechon and lechon belly in ${site.location.label}. \
+Whole lechon from ${peso(startingPrice(whole.sizes))}, lechon belly from \
+${peso(startingPrice(belly.sizes))}. ${site.delivery.short}. Order on Messenger, \
+${site.ordering.leadTimeShort} ahead.`;
+---
+
+<Base
+  title="Alzar's Lechon Haus — Lechon Delivery in Allen, Northern Samar"
+  description={description}
+  schema={[localBusinessSchema()]}
+>
+  <Hero />
+</Base>

@@ -1,0 +1,49 @@
+---
+import '../styles/tokens.css';
+import '../styles/fonts.css';
+import '../styles/global.css';
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StickyOrderBar from '../components/StickyOrderBar.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  schema?: Record<string, unknown>[];
+}
+
+const { title, description, ogImage, schema } = Astro.props as Props;
+---
+
+<!doctype html>
+<html lang="en-PH">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    {/* Fonts: self-hosted (src/styles/fonts.css, imported above), no Google
+        Fonts request. Preload only the three files the hero needs for
+        first paint — wordmark (display), tagline (display italic), body
+        copy — so text doesn't wait on a second render pass. The rest
+        (latin-ext, needed for ₱ further down the page) load lazily. */}
+    <link rel="preload" href="/fonts/fraunces-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/fraunces-italic-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-normal-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <SEO title={title} description={description} ogImage={ogImage} schema={schema} />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <StickyOrderBar />
+  </body>
+</html>

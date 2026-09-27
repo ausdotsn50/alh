@@ -1,0 +1,94 @@
+---
+import site from '../data/site.json';
+import { messengerFor } from '../lib/messenger';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="foot__in">
+    <div>
+      <a class="wordmark" href="/">{site.name}<span>{site.location.label}</span></a>
+      <p class="foot__blurb">{site.shortDescription}</p>
+    </div>
+
+    <div>
+      <h2 class="foot__h">Contact</h2>
+      <ul class="foot__list">
+        <li><a href={messengerFor('generic')}>Messenger</a></li>
+        <li><a href={site.contact.phoneHref}>{site.contact.phone}</a></li>
+        <li><a href={site.contact.facebookUrl}>Facebook Page</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="foot__h">Ordering</h2>
+      <ul class="foot__list">
+        <li>{site.ordering.leadTime}</li>
+        <li>{site.delivery.short}</li>
+        <li>{site.payment.method} payment</li>
+      </ul>
+      <h2 class="foot__h foot__h--gap">Pages</h2>
+      <ul class="foot__list">
+        {site.nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+      </ul>
+    </div>
+  </div>
+
+  <p class="foot__legal">© {year} {site.name} · {site.location.label}</p>
+</footer>
+
+<style>
+  .foot {
+    background: var(--color-bg-inverse);
+    color: var(--color-text-inverse);
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+  .foot__in {
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding: var(--space-8) var(--gutter);
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 720px) {
+    .foot__in { grid-template-columns: 1.2fr 1fr 1fr; }
+  }
+
+  .foot__blurb {
+    font-size: var(--text-sm);
+    opacity: 0.85;
+    max-width: 30ch;
+    margin-top: var(--space-3);
+  }
+
+  .foot__h {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-accent);
+    margin-bottom: 0.6rem;
+    font-weight: var(--weight-bold);
+  }
+  .foot__h--gap { margin-top: var(--space-6); }
+
+  .foot__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .foot a { color: var(--color-text-inverse); text-decoration: none; opacity: 0.85; }
+  .foot a:hover { opacity: 1; text-decoration: underline; }
+
+  .foot__legal {
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+    padding: var(--space-4) var(--gutter);
+    font-size: var(--text-xs);
+    opacity: 0.6;
+    max-width: var(--content-max);
+    margin-inline: auto;
+  }
+</style>
