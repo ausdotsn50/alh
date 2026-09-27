@@ -1,0 +1,92 @@
+---
+import site from '../data/site.json';
+import IconBadge from './IconBadge.astro';
+import type { IconName } from './IconBadge.astro';
+
+const points: { icon: IconName; h: string; p: string }[] = [
+  { icon: 'flame', h: 'Lutong uling', p: 'Roasted over wood, the way it should be. No shortcuts, no oven.' },
+  { icon: 'calendar', h: 'Roasted for your date', p: 'We cook to order. Nothing sitting in a warmer from yesterday.' },
+  { icon: 'pin', h: `Free delivery in ${site.location.locality}`, p: `Anywhere within ${site.location.locality}, no delivery charge.` },
+  { icon: 'bowl', h: 'Libreng dinuguan', p: 'Every whole lechon comes with dinuguan, free.' },
+];
+---
+
+{/*
+  Four promises as a 2x2 of cards: icon left, title and one line right.
+  Cards give the points structure on the toasted band (they fill with
+  --surface-2, so they read as cream there); icon-left rows keep the
+  section to about half a screen on phones. The grid is centred under
+  the centred heading; text inside the cards stays left-aligned.
+*/}
+<section class="section wrap band--sunken">
+  <header class="shead">
+    <p class="eyebrow">Bakit Alzar's?</p>
+    <h2 class="h2">Why people book us</h2>
+  </header>
+  <ul class="why" role="list">
+    {points.map((pt) => (
+      <li class="why__item">
+        <IconBadge name={pt.icon} tone="on-light" />
+        <div>
+          <h3 class="why__ih">{pt.h}</h3>
+          <p class="why__ip">{pt.p}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .why {
+    list-style: none;
+    display: grid;
+    /* Same gaps as the menu cards above (24px stacked, 32px side by
+       side). Never smaller than the cards' own padding, so they read as
+       four separate promises rather than one block cut into pieces. */
+    gap: var(--space-6);
+    max-width: 52rem;
+    margin-inline: auto;
+  }
+  @media (min-width: 40em) {
+    .why { grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+  }
+
+  .why__item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--surface-2);
+    border-radius: var(--radius-lg);
+    /* Resting depth only. No hover lift: these cards aren't links, and a
+       lift would promise a click that does nothing. */
+    box-shadow: var(--shadow-card);
+  }
+  /* Phones: a smaller badge and tighter card keep the four points to
+     about half a screen. */
+  .why__item :global(.iconbadge) { width: 2.5rem; height: 2.5rem; }
+  .why__item :global(.iconbadge svg) { width: 1.25rem; height: 1.25rem; }
+  @media (min-width: 40em) {
+    .why__item { gap: var(--space-4); padding: var(--space-5, 1.25rem) var(--space-6); }
+    .why__item :global(.iconbadge) { width: 3rem; height: 3rem; }
+    .why__item :global(.iconbadge svg) { width: 1.5rem; height: 1.5rem; }
+  }
+  /* A stronger gold circle than the default soft tint, which all but
+     vanished on this ground (1.05:1). The red stroke on it is ~5:1. */
+  .why__item :global(.iconbadge) {
+    background: color-mix(in srgb, var(--color-accent) 40%, var(--surface-2));
+  }
+
+  .why__ih {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+  .why__ip {
+    margin-top: 0.15rem;
+    line-height: 1.5;
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+  }
+</style>
