@@ -1,0 +1,26 @@
+{
+  "_note": "TODO(owner): photos for the 'Para sa bawat okasyon' gallery on the home page. Files live in src/assets/images/. 'occasion' must be the real event the photo was taken at (one of: Birthdays, Fiesta, Reunions, Binyag, Kasal, Pasko at Bagong Taon), or null. Never tag a photo with an occasion it wasn't taken at. Real customer event photos (with permission) make this section; the first photo gets the large tile.",
+  "items": [
+    {
+      "file": "lechon-belly-bilao-top-down.jpg",
+      "alt": "Lechon belly roll on a banana-leaf-lined bilao, two slices cut to show the stuffed spiral inside.",
+      "occasion": null
+    },
+    {
+      "file": "whole-lechon-spit-roast.jpg",
+      "alt": "A finished whole lechon on the spit, its skin roasted a deep glossy amber.",
+      "occasion": null,
+      "focus": "center 20%"
+    },
+    {
+      "file": "lechon-pit-roasting.jpg",
+      "alt": "A whole lechon roasting on a spit over wood coals in a block-walled pit.",
+      "occasion": null
+    },
+    {
+      "file": "lechon-belly-banana-leaf.jpg",
+      "alt": "Crisp, blistered lechon belly on banana leaf, close up.",
+      "occasion": null
+    }
+  ]
+}
