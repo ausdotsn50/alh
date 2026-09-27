@@ -1,0 +1,279 @@
+---
+import site from '../data/site.json';
+import { messengerFor } from '../lib/messenger';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) =>
+  href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+---
+
+{/*
+  Restaurant-style header on the page cream: links left, wordmark centred,
+  Order right. The centred wordmark echoes the centred dish in the home
+  hero; red is kept for the wordmark and the CTA. The hairline underneath
+  is what the banderitas hang from.
+
+  No lead-time caption under the button (owner's call, 2026-09-27). On
+  phones the sticky order bar carries it on the same screen.
+
+  Phones: menu toggle left, wordmark centred, compact Order right.
+
+  Hides while scrolling down, returns on any scroll up (script below).
+  DOM order is wordmark, toggle, links, Order, so keyboard focus runs in
+  the conventional order whatever the visual layout.
+*/}
+<header class="siteheader">
+  <div class="siteheader__in">
+    <a class="wordmark siteheader__mark" href="/">
+      {site.name}<span>{site.location.label}</span>
+    </a>
+
+    <button
+      class="navtoggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      aria-label="Menu"
+    >
+      <span class="navtoggle__bars" aria-hidden="true"></span>
+    </button>
+
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <ul class="nav__list">
+        {site.nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="siteheader__cta">
+      <a class="btn btn--primary btn--sm" href={messengerFor('generic')}>
+        <span class="cta__long">Order via Messenger</span>
+        <span class="cta__short">Order</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .siteheader {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 50;
+    background: var(--color-bg);
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
+    transition: transform 220ms ease, box-shadow var(--transition);
+  }
+  /* Scrolled away from the top: a soft shadow separates it from the cream
+     content sliding under it. Hidden: slid up out of view. */
+  .siteheader[data-scrolled='true'] { box-shadow: var(--shadow-sm); }
+  .siteheader[data-hidden='true'] { transform: translateY(-100%); }
+  @media (prefers-reduced-motion: reduce) {
+    .siteheader { transition: none; }
+  }
+
+  /* ---- Phones: toggle | wordmark | Order ---- */
+  .siteheader__in {
+    max-width: var(--content-max);
+    margin-inline: auto;
+    min-height: var(--header-h);
+    padding: 0.5rem var(--gutter);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas: 'toggle mark cta';
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .siteheader__mark {
+    grid-area: mark;
+    justify-self: center;
+    text-align: center;
+    color: var(--color-brand);
+    /* One line between the toggle and Order down to 360px wide. */
+    font-size: clamp(0.8125rem, 3.6vw, 1rem);
+    white-space: nowrap;
+  }
+  /* Muted brown, not gold: gold on cream is 2.8:1, this is 6.0:1. */
+  .siteheader__mark span { color: var(--color-text-muted); }
+
+  .navtoggle {
+    grid-area: toggle;
+    justify-self: start;
+    display: grid;
+    place-items: center;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    background: transparent;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+  .navtoggle__bars,
+  .navtoggle__bars::before,
+  .navtoggle__bars::after {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: currentColor;
+    transition: var(--transition);
+  }
+  .navtoggle__bars { position: relative; }
+  .navtoggle__bars::before,
+  .navtoggle__bars::after {
+    content: '';
+    position: absolute;
+    left: 0;
+  }
+  .navtoggle__bars::before { top: -6px; }
+  .navtoggle__bars::after { top: 6px; }
+  .navtoggle[aria-expanded='true'] .navtoggle__bars { background: transparent; }
+  .navtoggle[aria-expanded='true'] .navtoggle__bars::before { top: 0; transform: rotate(45deg); }
+  .navtoggle[aria-expanded='true'] .navtoggle__bars::after { top: 0; transform: rotate(-45deg); }
+
+  /* Phone menu: a cream panel dropping from the hairline. */
+  .nav {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    padding: var(--space-2) var(--gutter) var(--space-4);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow-md);
+  }
+  .nav[data-open='true'] { display: block; }
+  .nav__list { list-style: none; }
+  .nav a {
+    display: flex;
+    align-items: center;
+    min-height: var(--tap-min);
+    font-size: var(--text-base);
+    font-weight: var(--weight-medium);
+    color: var(--color-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+  .nav li:last-child a { border-bottom: 0; }
+  .nav a:hover { color: var(--color-brand); }
+  .nav a[aria-current='page'] {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 5px;
+    text-decoration-thickness: 2px;
+  }
+
+  .siteheader__cta {
+    grid-area: cta;
+    justify-self: end;
+  }
+  .siteheader__cta .btn { text-decoration: none; }
+  .cta__long { display: none; }
+
+  /* ---- Desktop: links | wordmark | Order ---- */
+  @media (min-width: 56em) {
+    .siteheader__in {
+      grid-template-areas: 'nav mark cta';
+      padding-block: 0.6rem;
+      gap: var(--space-4);
+    }
+    .navtoggle { display: none; }
+    .siteheader__mark { font-size: var(--text-lg); }
+
+    .nav {
+      grid-area: nav;
+      justify-self: start;
+      display: block;
+      position: static;
+      padding: 0;
+      background: none;
+      border: 0;
+      box-shadow: none;
+    }
+    .nav__list { display: flex; gap: var(--space-6); }
+    .nav a {
+      display: inline;
+      min-height: 0;
+      font-size: 0.9375rem;
+      letter-spacing: 0.02em;
+      border: 0;
+    }
+
+    .cta__short { display: none; }
+    .cta__long { display: inline; }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.siteheader');
+  const toggle = document.querySelector<HTMLButtonElement>('.navtoggle');
+  const nav = document.querySelector<HTMLElement>('#site-nav');
+
+  const isOpen = () => toggle?.getAttribute('aria-expanded') === 'true';
+
+  if (toggle && nav) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      nav.dataset.open = String(open);
+    };
+
+    toggle.addEventListener('click', () => setOpen(!isOpen()));
+
+    // Escape closes and returns focus to the control that opened it.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Reset state if the viewport grows past the phone layout.
+    window.matchMedia('(min-width: 56em)').addEventListener('change', (e) => {
+      if (e.matches) setOpen(false);
+    });
+  }
+
+  /* Hide on scroll down, show on scroll up. Never hidden near the top,
+     while the phone menu is open, or while focus is inside the header —
+     a keyboard user tabbing into it must be able to see it. */
+  if (header) {
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    const update = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      const nearTop = y < header.offsetHeight * 2;
+      const pinned = isOpen() || header.contains(document.activeElement);
+
+      header.dataset.scrolled = String(y > 4);
+      if (nearTop || pinned || delta < -4) header.dataset.hidden = 'false';
+      else if (delta > 4) header.dataset.hidden = 'true';
+
+      if (Math.abs(delta) > 4) lastY = y;
+      ticking = false;
+    };
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true }
+    );
+    header.addEventListener('focusin', () => (header.dataset.hidden = 'false'));
+    update();
+  }
+</script>
