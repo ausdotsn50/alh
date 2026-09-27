@@ -127,6 +127,13 @@
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
   --shadow-md: 0 4px 16px rgb(0 0 0 / 0.10);
   --shadow-lg: 0 12px 36px rgb(0 0 0 / 0.14);
+  /* Warm-tinted resting shadow for cards on cream/toasted grounds: a tight
+     contact shadow plus a soft ambient one, tinted with the text brown so
+     it reads as depth rather than grey dirt on the cream. Static — used on
+     cards that aren't clickable, so no hover lift goes with it. */
+  --shadow-card:
+    0 1px 2px color-mix(in srgb, var(--color-text) 7%, transparent),
+    0 6px 18px -6px color-mix(in srgb, var(--color-text) 14%, transparent);
 
   /* ---- Motion ---- */
   --transition: 160ms ease;

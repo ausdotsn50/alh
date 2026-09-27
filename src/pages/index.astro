@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
+import RoastBand from '../components/RoastBand.astro';
 import Occasions from '../components/Occasions.astro';
 import { localBusinessSchema } from '../lib/schema';
 import site from '../data/site.json';
@@ -20,5 +21,6 @@ ${site.ordering.leadTimeShort} ahead.`;
   schema={[localBusinessSchema()]}
 >
   <Hero />
+  <RoastBand />
   <Occasions />
 </Base>
