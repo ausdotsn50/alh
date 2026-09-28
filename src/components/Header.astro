@@ -3,8 +3,11 @@ import site from '../data/site.json';
 import { messengerFor } from '../lib/messenger';
 
 const path = Astro.url.pathname;
+/* A nav address shared by several items (the temporary /order page)
+   marks none of them as the current page. */
+const shared = (href: string) => site.nav.filter((n) => n.href === href).length > 1;
 const isCurrent = (href: string) =>
-  href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+  !shared(href) && (href === '/' ? path === '/' : path === href || path.startsWith(href + '/'));
 ---
 
 {/*
@@ -13,8 +16,9 @@ const isCurrent = (href: string) =>
   hero; red is kept for the wordmark and the CTA. The hairline underneath
   is what the banderitas hang from.
 
-  No lead-time caption under the button (owner's call, 2026-09-27). On
-  phones the sticky order bar carries it on the same screen.
+  No lead-time caption under the button (owner's call, 2026-09-27), and
+  no sticky order bar on phones either (removed 2026-09-28): this Order
+  button is the one persistent CTA at every width.
 
   Phones: menu toggle left, wordmark centred, compact Order right.
 
@@ -51,7 +55,7 @@ const isCurrent = (href: string) =>
     </nav>
 
     <div class="siteheader__cta">
-      <a class="btn btn--primary btn--sm" href={messengerFor('generic')}>
+      <a class="btn btn--primary btn--sm" target="_blank" rel="noopener" href={messengerFor('generic')}>
         <span class="cta__long">Order via Messenger</span>
         <span class="cta__short">Order</span>
       </a>
@@ -98,6 +102,13 @@ const isCurrent = (href: string) =>
     /* One line between the toggle and Order down to 360px wide. */
     font-size: clamp(0.8125rem, 3.6vw, 1rem);
     white-space: nowrap;
+  }
+  /* Narrower than that, the name tightens a step so it still fits on one
+     line instead of pushing Order off the screen. */
+  @media (max-width: 359px) {
+    .siteheader__in { gap: var(--space-1); }
+    .siteheader__mark { font-size: 0.75rem; letter-spacing: 0.02em; }
+    .siteheader__mark span { letter-spacing: 0.12em; }
   }
   /* Muted brown, not gold: gold on cream is 2.8:1, this is 6.0:1. */
   .siteheader__mark span { color: var(--color-text-muted); }

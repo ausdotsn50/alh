@@ -69,7 +69,7 @@ const offers = ['lechon-belly', 'whole-lechon'].map((id) => {
       <li>{site.ordering.leadTime}</li>
       <li>{site.delivery.short}</li>
     </ul>
-    <a class="hero__link" href="/menu">See all prices <span aria-hidden="true">→</span></a>
+    <a class="hero__link" href="/order">See all prices <span aria-hidden="true">→</span></a>
   </div>
 </section>
 
@@ -235,8 +235,10 @@ const offers = ['lechon-belly', 'whole-lechon'].map((id) => {
       margin: 0;
       padding: 0;
     }
+    /* Centred vertically against the taller prices column beside it. */
     .hero__side--what {
       justify-self: end;
+      align-self: center;
       text-align: right;
       padding-right: var(--space-8);
     }
@@ -266,9 +268,17 @@ const offers = ['lechon-belly', 'whole-lechon'].map((id) => {
       /* Capped at 62vw so a tall screen (a portrait iPad Pro, a tall
          browser window) can't grow the dish until it squeezes the two
          copy columns to a word per line. */
-      --hero-h: min(calc(100vh - var(--header-h)), 62vw);
-      --hero-h: min(calc(100svh - var(--header-h)), 62vw);
-      --dish: calc(var(--hero-h) * 0.6);
+      /* Very large viewports (a big monitor, or the page zoomed out) get
+         the same composition, not a stretched one. The dish tracks the
+         hero's height but stops at 38rem — the most it can take while the
+         two copy columns keep ~16rem each inside the 80rem frame — and
+         the hero stops at 64rem so the dish keeps its 60% share of it.
+         Without these caps the dish kept growing with the screen height
+         while the rem-sized text did not, crushing the copy to a word per
+         line and then overlapping it. */
+      --hero-h: min(calc(100vh - var(--header-h)), 62vw, 64rem);
+      --hero-h: min(calc(100svh - var(--header-h)), 62vw, 64rem);
+      --dish: min(calc(var(--hero-h) * 0.6), 38rem);
       --img-h: calc(var(--dish) / 0.77);
       --dish-y: 54%;
       --frame: max(var(--gutter), calc(50% - 40rem + var(--gutter)));

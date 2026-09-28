@@ -42,15 +42,15 @@
   "nav": [
     {
       "label": "Menu",
-      "href": "/menu"
+      "href": "/order"
     },
     {
       "label": "About",
-      "href": "/about"
+      "href": "/order"
     },
     {
       "label": "Contact",
-      "href": "/contact"
+      "href": "/order"
     }
   ],
   "messengerPrefill": {

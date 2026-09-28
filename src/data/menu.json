@@ -7,8 +7,8 @@
       "weightBasisLabel": "Priced by live weight",
       "blurb": "For the big handaan. Slow-roasted over wood until the skin turns glassy.",
       "description": "Whole pig, slow-roasted over wood coals until the skin crackles. Priced by live weight and roasted fresh for your date.",
-      "image": "whole-lechon-spit-roast.jpg",
-      "imageAlt": "Whole roast pig on the spit, skin crisped to a deep amber.",
+      "image": "lechon-pit-roasting.jpg",
+      "imageAlt": "A whole lechon on a metal spit over glowing wood coals in a block-walled pit, smoke drifting up.",
       "freebie": "Comes with free dinuguan",
       "prefillKey": "whole",
       "sizes": [
@@ -53,7 +53,7 @@
           "price": 13000
         }
       ],
-      "imageFocus": "top"
+      "imageFocus": "center"
     },
     {
       "id": "lechon-belly",
@@ -62,8 +62,8 @@
       "weightBasisLabel": "Priced by raw weight",
       "blurb": "Boneless, rolled, and easy to slice. Right-sized for smaller gatherings.",
       "description": "Boneless pork belly, rolled and roasted until the skin blisters. Priced by raw weight and roasted fresh for your date.",
-      "image": "lechon-belly-banana-leaf.jpg",
-      "imageAlt": "Rolled lechon belly resting on a banana leaf, skin blistered and crisp.",
+      "image": "lechon-belly-in-foil.jpg",
+      "imageAlt": "Lechon belly in a foil-lined box, its skin blistered into crisp golden bubbles.",
       "freebie": null,
       "prefillKey": "belly",
       "sizes": [

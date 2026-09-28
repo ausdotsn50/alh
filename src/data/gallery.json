@@ -1,26 +1,41 @@
 {
-  "_note": "TODO(owner): photos for the 'Para sa bawat okasyon' gallery on the home page. Files live in src/assets/images/. 'occasion' must be the real event the photo was taken at (one of: Birthdays, Fiesta, Reunions, Binyag, Kasal, Pasko at Bagong Taon), or null. Never tag a photo with an occasion it wasn't taken at. Real customer event photos (with permission) make this section; the first photo gets the large tile.",
+  "_note": "Photos for the 'Para sa bawat okasyon' gallery on the home page, in display order. Files live in src/assets/images/. Cooked lechon only — no raw-meat or prep shots. 'occasion' is the tag shown on the photo (one of: Piyesta, Bagong Taon at Pasko, Birthday, Reunion, Salo-salo — the pool in Occasions.astro), or null for no tag. The tags were assigned for marketing at the owner's direction (2026-09-28); replace any with the real event once known. Layout repeats every four photos — a large tile, a tall tile, two small — so landscape shots suit positions 1, 5, 9…, portrait shots positions 2, 6, 10…",
   "items": [
     {
-      "file": "lechon-belly-bilao-top-down.jpg",
-      "alt": "Lechon belly roll on a banana-leaf-lined bilao, two slices cut to show the stuffed spiral inside.",
-      "occasion": null
+      "file": "whole-lechon-finished-on-foil.jpg",
+      "alt": "A whole lechon, roasted a deep glossy mahogany, laid on foil on a wooden table as hands ready it for the table.",
+      "occasion": "Piyesta"
     },
     {
-      "file": "whole-lechon-spit-roast.jpg",
-      "alt": "A finished whole lechon on the spit, its skin roasted a deep glossy amber.",
-      "occasion": null,
-      "focus": "center 20%"
+      "file": "lechon-belly-in-foil.jpg",
+      "alt": "Lechon belly in a foil-lined box, its skin blistered into crisp golden bubbles.",
+      "occasion": "Birthday"
     },
     {
-      "file": "lechon-pit-roasting.jpg",
-      "alt": "A whole lechon roasting on a spit over wood coals in a block-walled pit.",
-      "occasion": null
+      "file": "lechon-on-spit-over-coals.jpg",
+      "alt": "A whole lechon turning on a spit over glowing coals in a block-walled pit, smoke rising behind it.",
+      "occasion": "Reunion"
     },
     {
-      "file": "lechon-belly-banana-leaf.jpg",
-      "alt": "Crisp, blistered lechon belly on banana leaf, close up.",
-      "occasion": null
+      "file": "dinuguan-trays.jpg",
+      "alt": "Four white trays filled with dinuguan, ready to go out with an order.",
+      "occasion": "Salo-salo"
+    },
+    {
+      "file": "lechon-belly-crackling-banana-leaf.jpg",
+      "alt": "Close-up of a lechon belly roll on banana leaf, its crackling glazed deep red-gold.",
+      "occasion": "Bagong Taon at Pasko"
+    },
+    {
+      "file": "lechon-packed-for-delivery.jpg",
+      "alt": "Two of the Alzar's family wrapping a whole lechon in yellow paper and cardboard for delivery.",
+      "occasion": "Piyesta",
+      "focus": "center 30%"
+    },
+    {
+      "file": "whole-lechon-at-night-event.jpg",
+      "alt": "A whole lechon on its spit at an evening celebration, skin shining under the lights.",
+      "occasion": "Birthday"
     }
   ]
 }

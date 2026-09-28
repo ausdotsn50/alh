@@ -199,10 +199,23 @@ const stripW = stripFlags.length * 10;
     class:list={['bunting', `bunting--${variant}`, `bunting--${tone}`, sway && 'bunting--sway']}
     aria-hidden="true"
   >
-    {sets.map((set) => (
+    {sets.flatMap((set) =>
+      /* Swags never cross the centre, so each corner gets its own SVG
+         (a half-width viewBox onto the same artboard). That lets the two
+         corners cap their size on very wide screens (a big monitor, or the
+         page zoomed out) instead of growing with the viewport and hanging
+         over the capped hero dish; the open centre simply widens. At
+         ordinary widths it renders exactly as one full-width SVG did. */
+      variant === 'swags'
+        ? [
+            { ...set, cls: `${set.cls} bunting__svg--left`, vb: `0 0 ${set.box.w / 2} ${set.box.h}` },
+            { ...set, cls: `${set.cls} bunting__svg--right`, vb: `${set.box.w / 2} 0 ${set.box.w / 2} ${set.box.h}` },
+          ]
+        : [{ ...set, vb: `0 0 ${set.box.w} ${set.box.h}` }]
+    ).map((set) => (
       <svg
         class:list={['bunting__svg', set.cls]}
-        viewBox={`0 0 ${set.box.w} ${set.box.h}`}
+        viewBox={set.vb}
         role="presentation"
         focusable="false"
       >
@@ -237,7 +250,8 @@ const stripW = stripFlags.length * 10;
   :global(:has(> .bunting--canopy)) { --bunting-drop: calc(100vw * 96 / 360); }
   :global(:has(> .bunting--street)) { --bunting-drop: calc(100vw * 74 / 360); }
   @media (min-width: 48em) {
-    :global(:has(> .bunting--swags)) { --bunting-drop: calc(100vw * 150 / 1440); }
+    /* Each corner is half the artboard (720 x 150), capped at 50rem. */
+    :global(:has(> .bunting--swags)) { --bunting-drop: calc(min(50vw, 50rem) * 150 / 720); }
     :global(:has(> .bunting--canopy)) { --bunting-drop: calc(100vw * 210 / 1440); }
     :global(:has(> .bunting--street)) { --bunting-drop: calc(100vw * 130 / 1440); }
   }
@@ -252,6 +266,10 @@ const stripW = stripFlags.length * 10;
   }
   /* Clipped: the tie points sit outside the artboard on purpose. */
   .bunting__svg { position: absolute; top: 0; left: 0; display: block; width: 100%; height: auto; overflow: hidden; }
+  /* Swags: one SVG per corner, each at most 50rem wide (their size on a
+     1600px screen), anchored to its own corner. */
+  .bunting--swags .bunting__svg { width: min(50%, 50rem); }
+  .bunting--swags .bunting__svg--right { left: auto; right: 0; }
   /* The fold: a darker half gives each pennant a little body. */
   .bunting__shade { fill: rgb(0 0 0 / 0.14); }
 

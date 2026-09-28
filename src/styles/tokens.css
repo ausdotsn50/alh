@@ -22,7 +22,7 @@
   --color-bg-alt:          #FFFFFF;  /* cards, raised surfaces, photo mounts */
   --color-bg-sunken:       #EFE4D2;  /* toasted cream — a quiet grouping surface, one step below the page. Muted text 5.4:1 */
   --color-bg-inverse:      #A31E22;  /* deep flyer red — hero, header, footer, feature bands */
-  --color-bg-inverse-deep: #7C1418;  /* darker red — final CTA, sticky order bar, overlays */
+  --color-bg-inverse-deep: #7C1418;  /* darker red — final CTA, overlays */
 
   /* ---- Text ---- */
   --color-text:            #2B1A16;  /* near-black, warm cast */
@@ -65,6 +65,12 @@
   --color-deco-2:          #D94A3D;  /* warm red-orange */
   --color-deco-3:          #3E7CA8;  /* blue — the flyer's third bunting color */
   --color-deco-4:          #FCEFD4;  /* cream — stands in for red-orange on red grounds */
+
+  /* ---- Chat preview (final CTA) ----
+     The sent-message bubble: the bunting blue taken down a step so cream
+     text clears contrast on it (5.1:1). Messenger's own blue fails with
+     light text, and this keeps the bubble inside the Fiesta palette. */
+  --color-chat-out:        #2F6A94;
 
   /* ---- Surface pair ----
      What a component sits on, and the one step off it for anything it
@@ -140,9 +146,6 @@
 
   /* ---- Touch targets — PH mobile-first audience ---- */
   --tap-min: 44px;
-
-  /* ---- Sticky mobile order bar ---- */
-  --order-bar-h: 64px;
 }
 
 @media (prefers-reduced-motion: reduce) {

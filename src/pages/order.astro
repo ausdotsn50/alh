@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import site from '../data/site.json';
+
+/* TEMPORARY stand-in while the Menu, About and Contact pages are being
+   redone: the nav and the home page's "see prices" links point here.
+   It is the home page's final CTA, unchanged. When those pages are ready,
+   point the links back (site.json "nav", Hero.astro, SizePicker.astro)
+   and delete this page. */
+---
+
+<Base
+  title={`Order — ${site.name} | ${site.location.label}`}
+  description={`Order whole lechon or lechon belly on ${site.ordering.channel}. ${site.ordering.leadTime}. ${site.delivery.short}.`}
+>
+  <h1 class="visually-hidden">Order from {site.name}</h1>
+  <FinalCTA />
+</Base>

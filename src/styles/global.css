@@ -265,6 +265,3 @@ h1, h2, h3, h4 {
 .prose { max-width: var(--prose-max); }
 .prose p + p { margin-top: var(--space-4); }
 .prose a { color: var(--color-accent-text); font-weight: 600; }
-
-/* ---------- sticky order bar clearance ---------- */
-@media (max-width: 719px) { body { padding-bottom: 78px; } }

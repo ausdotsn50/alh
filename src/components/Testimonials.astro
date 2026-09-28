@@ -1,0 +1,179 @@
+---
+import testimonials from '../data/testimonials.json';
+import type { Testimonial } from '../lib/types';
+import site from '../data/site.json';
+import iconQuote from '@tabler/icons/filled/quote.svg?raw';
+import iconCheck from '@tabler/icons/filled/circle-check.svg?raw';
+
+/* Customer reviews as a slow marquee of quote cards on the toasted band,
+   in the slot the old photo gallery had.
+
+   Renders nothing on the built site while the list is empty. TASKS.md
+   Phase 3: do not ship fake quotes. The section appears on its own the
+   moment the owner supplies real ones with permission to publish.
+
+   In `astro dev` only, an empty list shows clearly marked placeholder
+   cards so the layout can be judged. They are never built. */
+const real = testimonials.items as Testimonial[];
+const placeholders: Testimonial[] = Array.from({ length: 5 }, () => ({
+  quote: 'Customer quote goes here — TODO(owner): a real review, with permission.',
+  name: 'Customer name',
+  occasion: 'Occasion',
+}));
+const items = real.length > 0 ? real : import.meta.env.DEV ? placeholders : [];
+const isPlaceholder = real.length === 0;
+
+/* One loop "set" must be wider than the widest screen, or the loop shows
+   a gap at its end. With few reviews, the set repeats them until it holds
+   at least eight cards (8 x 22rem + gaps is ~3,000px). Only the first
+   pass of the real reviews is announced; every repeat is aria-hidden. */
+const MIN_CARDS = 8;
+/* "JO" from "Jhoona Ongray": first letters of the first and last words. */
+const initials = (name: string) => {
+  const w = name.trim().split(/\s+/);
+  return (w[0][0] + (w.length > 1 ? w[w.length - 1][0] : '')).toUpperCase();
+};
+
+const set = Array.from({ length: Math.max(1, Math.ceil(MIN_CARDS / items.length)) }, () => items).flat();
+---
+
+{items.length > 0 && (
+  <section class="section band--sunken tst" aria-labelledby="tst-h">
+    <header class="shead wrap">
+      <p class="eyebrow">Sabi ng mga customer</p>
+      <h2 class="h2" id="tst-h">What people tell us</h2>
+    </header>
+
+    {/*
+      The track holds the set twice so the loop is seamless; everything
+      after the first pass of the reviews is hidden from assistive tech.
+      Pauses on hover and while focus is inside. Reduced motion: no
+      animation, a swipeable strip showing each review once.
+    */}
+    <div class="tmarquee">
+      <ul class="tmarquee__track" role="list">
+        {[0, 1].map((copy) =>
+          set.map((t, i) => {
+            const repeat = copy === 1 || i >= items.length;
+            return (
+            <li
+              class:list={['tcard', isPlaceholder && 'tcard--todo']}
+              aria-hidden={repeat ? 'true' : undefined}
+              data-repeat={repeat ? '' : undefined}
+            >
+              {/* Card: a quote mark, the quote, then who said it — an initials
+                  avatar, the name, and "Recommends …", the way Facebook
+                  shows a page recommendation (it has no star ratings). */}
+              <span class="tcard__mark" aria-hidden="true" set:html={iconQuote} />
+              <blockquote class="tcard__quote">{t.quote}</blockquote>
+              <div class="tcard__by">
+                <span class="tcard__avatar" aria-hidden="true">{initials(t.name)}</span>
+                <p class="tcard__who">
+                  <span class="tcard__name">{t.name}{t.occasion && <span> · {t.occasion}</span>}</span>
+                  <span class="tcard__rec">
+                    <span class="tcard__check" aria-hidden="true" set:html={iconCheck} />
+                    Recommends {site.name}
+                  </span>
+                </p>
+              </div>
+            </li>
+            );
+          })
+        )}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .tst { overflow: hidden; }
+
+  .tmarquee {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+  .tmarquee__track {
+    list-style: none;
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-6);
+    width: max-content;
+    padding-block: var(--space-2) var(--space-4);
+    animation: tmarquee 60s linear infinite;
+  }
+  .tmarquee:hover .tmarquee__track,
+  .tmarquee:focus-within .tmarquee__track { animation-play-state: paused; }
+  @keyframes tmarquee {
+    to { transform: translateX(calc(-50% - var(--space-6) / 2)); }
+  }
+
+  .tcard {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    width: min(80vw, 22rem);
+    padding: var(--space-6);
+    background: var(--surface-2);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+  .tcard__mark :global(svg) {
+    display: block;
+    width: 1.75rem;
+    height: 1.75rem;
+    color: var(--color-accent);
+  }
+  .tcard__quote {
+    flex: 1;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    line-height: 1.4;
+    color: var(--color-text);
+  }
+  /* Who said it: pinned to the card's bottom, over a hairline. */
+  .tcard__by {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+  .tcard__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: var(--color-brand);
+    color: var(--color-cta-text);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.04em;
+  }
+  .tcard__who { display: grid; gap: 0.1rem; line-height: 1.3; }
+  .tcard__name { font-size: var(--text-sm); font-weight: var(--weight-bold); color: var(--color-text); }
+  /* The check sits on the first line if the text wraps on a phone. */
+  .tcard__rec {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.3rem;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+  .tcard__check :global(svg) { display: block; width: 0.9rem; height: 0.9rem; margin-top: 0.1rem; color: var(--color-brand); }
+  .tcard--todo {
+    outline: 1.5px dashed var(--color-border-strong);
+    outline-offset: -6px;
+  }
+  .tcard--todo .tcard__quote { color: var(--color-text-muted); font-style: italic; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tmarquee { overflow-x: auto; scroll-snap-type: x mandatory; }
+    .tmarquee__track { animation: none; padding-inline: var(--gutter); }
+    .tcard { scroll-snap-align: center; }
+    .tcard[data-repeat] { display: none; }
+  }
+</style>

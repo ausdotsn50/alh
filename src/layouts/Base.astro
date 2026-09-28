@@ -5,7 +5,6 @@ import '../styles/global.css';
 import SEO from '../components/SEO.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import StickyOrderBar from '../components/StickyOrderBar.astro';
 
 interface Props {
   title: string;
@@ -23,7 +22,10 @@ const { title, description, ogImage, schema } = Astro.props as Props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {/* The owner's photo, cropped round like the Facebook page's profile
+        picture, so the tab matches the page people arrive from. */}
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     {/* Fonts: self-hosted (src/styles/fonts.css, imported above), no Google
         Fonts request. Preload only the three files the hero needs for
@@ -44,6 +46,5 @@ const { title, description, ogImage, schema } = Astro.props as Props;
       <slot />
     </main>
     <Footer />
-    <StickyOrderBar />
   </body>
 </html>
