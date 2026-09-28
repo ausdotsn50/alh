@@ -54,10 +54,11 @@
     }
   ],
   "messengerPrefill": {
-    "generic": "Hi Alzar's! I'd like to order lechon. Can you help me with sizes and available dates?",
-    "whole": "Hi Alzar's! I'm interested in a whole lechon. Can you help me pick a size?",
-    "belly": "Hi Alzar's! I'm interested in lechon belly. Can you help me pick a size?",
-    "sizing": "Hi Alzar's! I'm not sure what size I need. Can you help me work it out?"
+    "generic": "Hi Alzar's Lechon Haus! I want to make an order.\n\nType: [whole lechon or lechon belly]\nDate: [date of your event]\nHeadcount: [number of guests]",
+    "whole": "Hi Alzar's Lechon Haus! I'm interested in a whole lechon. Can you help me pick a size?",
+    "belly": "Hi Alzar's Lechon Haus! I'm interested in lechon belly. Can you help me pick a size?",
+    "sizing": "Hi Alzar's Lechon Haus! I'm not sure what size I need. Can you help me work it out?",
+    "order": "Hi Alzar's Lechon Haus! I'd like to order lechon.\n\nDate: [date needed]\nHeadcount: [number of guests]\n\nWhat size would you suggest?"
   },
   "seo": {
     "siteUrl": "https://alzars-lechon-haus.netlify.app",

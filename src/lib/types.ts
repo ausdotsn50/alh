@@ -29,7 +29,7 @@ export interface Menu {
   currencySymbol: string;
 }
 
-export type PrefillKey = 'generic' | 'whole' | 'belly' | 'sizing';
+export type PrefillKey = 'generic' | 'whole' | 'belly' | 'sizing' | 'order';
 
 export interface NavItem {
   label: string;

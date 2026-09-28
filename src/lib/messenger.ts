@@ -19,9 +19,20 @@ export function messengerFor(key: PrefillKey): string {
   return messengerUrl(site.messengerPrefill[key]);
 }
 
-/** Link for a specific size row: "the 20 kg Whole Lechon (20–30 pax)". */
+/** Link for a specific size: names the product and size, with bracketed
+ *  placeholders for the date and address that the customer overwrites in
+ *  Messenger before sending (the owner needs both to confirm). */
 export function messengerForSize(product: Product, size: Size): string {
   return messengerUrl(
-    `Hi Alzar's! I'd like to order the ${size.weightLabel} ${product.name} (${size.servesLabel}). Is it available for my date?`
+    [
+      `Hi ${site.name}! I'd like to order:`,
+      `• ${product.name}, ${size.weightLabel} (${size.servesLabel})`,
+      '',
+      'Date: [date needed]',
+      `Delivery address: [barangay, ${site.location.locality}]`,
+      '',
+      'Is this date available?',
+    ].join('\n')
   );
 }
+
