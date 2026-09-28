@@ -3,92 +3,214 @@ import site from '../data/site.json';
 import { messengerFor } from '../lib/messenger';
 
 const year = new Date().getFullYear();
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(href + '/');
+
+/* Contact links. Phones show each as a round icon button (its label kept
+   for screen readers); tablet and desktop show the label as a text link. */
+const contacts = [
+  {
+    href: messengerFor('generic'),
+    label: 'Messenger',
+    icon: 'M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.14.26.35.27.57l.05 1.78c.02.57.6.94 1.12.71l1.98-.87c.17-.08.36-.09.53-.04.91.25 1.87.38 2.91.38 5.64 0 10-4.13 10-9.7S17.64 2 12 2Zm6 7.46-2.94 4.66c-.47.74-1.47.93-2.17.4l-2.34-1.75a.6.6 0 0 0-.72 0l-3.16 2.4c-.42.32-.97-.18-.69-.63l2.94-4.66c.47-.74 1.47-.93 2.17-.4l2.34 1.75a.6.6 0 0 0 .72 0l3.16-2.4c.42-.32.97.18.69.63Z',
+  },
+  {
+    href: site.contact.phoneHref,
+    label: site.contact.phone,
+    icon: 'M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1l-2.2 2.23Z',
+  },
+  {
+    href: site.contact.facebookUrl,
+    label: 'Facebook Page',
+    icon: 'M13.5 21v-7.5h2.5l.4-3h-2.9V8.6c0-.87.25-1.46 1.5-1.46H16.6V4.46A21 21 0 0 0 14.3 4.3c-2.3 0-3.8 1.4-3.8 3.9v2.3H8v3h2.5V21h3Z',
+  },
+];
 ---
 
+{/*
+  Tablet and desktop: three columns — brand, pages, contact — with the
+  brand column taking the spare width so the link columns sit together
+  on the right. Type follows the header: the wordmark at its desktop size,
+  column labels in small tracked caps, links in the nav's Inter Medium
+  with the same gold underline for the current page.
+
+  Phones: one centred, compact stack, like a sign-off rather than a
+  sitemap — the wordmark and one line about us, the pages as a single
+  row of links, the contacts as three round icon buttons, then the
+  copyright on one line. Every link and button is a 44px tap target.
+
+  Ordering terms aren't repeated here; the final CTA directly above
+  carries them on every page. Muted text is cream at 78%: 4.6:1 on this
+  red. The flyer gold (3.6:1) is too light for small text on it.
+*/}
 <footer class="foot">
   <div class="foot__in">
-    <div>
-      <a class="wordmark" href="/">{site.name}<span>{site.location.label}</span></a>
+    <div class="foot__brand">
+      <a class="wordmark foot__mark" href="/">{site.name}<span>{site.location.label}</span></a>
       <p class="foot__blurb">{site.shortDescription}</p>
     </div>
 
-    <div>
-      <h2 class="foot__h">Contact</h2>
-      <ul class="foot__list">
-        <li><a href={messengerFor('generic')}>Messenger</a></li>
-        <li><a href={site.contact.phoneHref}>{site.contact.phone}</a></li>
-        <li><a href={site.contact.facebookUrl}>Facebook Page</a></li>
+    <nav class="foot__col" aria-labelledby="foot-pages">
+      <h2 class="foot__h" id="foot-pages">Pages</h2>
+      <ul class="foot__list foot__pages" role="list">
+        {site.nav.map((item) => (
+          <li>
+            <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+          </li>
+        ))}
       </ul>
-    </div>
+    </nav>
 
-    <div>
-      <h2 class="foot__h">Ordering</h2>
-      <ul class="foot__list">
-        <li>{site.ordering.leadTime}</li>
-        <li>{site.delivery.short}</li>
-        <li>{site.payment.method} payment</li>
-      </ul>
-      <h2 class="foot__h foot__h--gap">Pages</h2>
-      <ul class="foot__list">
-        {site.nav.map((item) => <li><a href={item.href}>{item.label}</a></li>)}
+    <div class="foot__col">
+      <h2 class="foot__h">Contact</h2>
+      <ul class="foot__list foot__contact" role="list">
+        {contacts.map((c) => (
+          <li>
+            <a href={c.href}>
+              <svg class="foot__ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={c.icon} /></svg>
+              <span class="foot__label">{c.label}</span>
+            </a>
+          </li>
+        ))}
       </ul>
     </div>
   </div>
 
-  <p class="foot__legal">© {year} {site.name} · {site.location.label}</p>
+  <p class="foot__legal">
+    <span>© {year} {site.name}<span class="foot__sep" aria-hidden="true"> ·</span></span> <span>{site.location.label}</span>
+  </p>
 </footer>
 
 <style>
   .foot {
+    --foot-muted: color-mix(in srgb, var(--color-text-inverse) 78%, transparent);
+    --foot-rule: rgb(255 255 255 / 0.12);
     background: var(--color-bg-inverse);
     color: var(--color-text-inverse);
-    border-top: 1px solid rgb(255 255 255 / 0.12);
-  }
-  .foot__in {
-    max-width: var(--content-max);
-    margin-inline: auto;
-    padding: var(--space-8) var(--gutter);
-    display: grid;
-    gap: var(--space-6);
-    grid-template-columns: 1fr;
-  }
-  @media (min-width: 720px) {
-    .foot__in { grid-template-columns: 1.2fr 1fr 1fr; }
+    border-top: 1px solid var(--foot-rule);
   }
 
+  .foot__mark { font-size: var(--text-lg); color: var(--color-text-inverse); white-space: nowrap; }
+  .foot__mark span { color: var(--foot-muted); }
   .foot__blurb {
     font-size: var(--text-sm);
-    opacity: 0.85;
+    color: var(--foot-muted);
     max-width: 30ch;
     margin-top: var(--space-3);
   }
 
   .foot__h {
     font-family: var(--font-body);
-    font-size: var(--text-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--color-accent);
-    margin-bottom: 0.6rem;
+    font-size: var(--text-xs);
     font-weight: var(--weight-bold);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--foot-muted);
+    margin-bottom: var(--space-2);
   }
-  .foot__h--gap { margin-top: var(--space-6); }
 
-  .foot__list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+  .foot__list { list-style: none; }
+  .foot__list a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-min);
+    font-size: 0.9375rem;
+    font-weight: var(--weight-medium);
+    letter-spacing: 0.02em;
+    color: var(--color-text-inverse);
+    text-decoration: none;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--color-accent);
+    transition: var(--transition);
   }
-  .foot a { color: var(--color-text-inverse); text-decoration: none; opacity: 0.85; }
-  .foot a:hover { opacity: 1; text-decoration: underline; }
+  .foot__list a[href^='tel:'] { white-space: nowrap; }
+  .foot__pages a:hover,
+  .foot__pages a[aria-current='page'] { text-decoration-line: underline; }
 
   .foot__legal {
-    border-top: 1px solid rgb(255 255 255 / 0.12);
+    border-top: 1px solid var(--foot-rule);
     padding: var(--space-4) var(--gutter);
     font-size: var(--text-xs);
-    opacity: 0.6;
-    max-width: var(--content-max);
-    margin-inline: auto;
+    color: var(--foot-muted);
+  }
+
+  /* ---- Phones: centred sign-off ---- */
+  @media (max-width: 44.999em) {
+    .foot__in {
+      padding: var(--space-12) var(--gutter) var(--space-8);
+      display: grid;
+      justify-items: center;
+      gap: var(--space-6);
+      text-align: center;
+    }
+    .foot__blurb { margin-inline: auto; }
+    .foot__h {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    /* Pages: one row, dot-separated. */
+    .foot__pages { display: flex; justify-content: center; }
+    .foot__pages a { padding-inline: var(--space-3); }
+    .foot__pages li + li::before {
+      content: '·';
+      color: var(--foot-muted);
+      speak: never;
+    }
+
+    /* Contacts: round icon buttons, label for screen readers only. */
+    .foot__contact { display: flex; justify-content: center; gap: var(--space-3); }
+    .foot__contact a {
+      justify-content: center;
+      width: var(--tap-min);
+      height: var(--tap-min);
+      border-radius: 50%;
+      border: 1px solid rgb(255 255 255 / 0.28);
+    }
+    .foot__contact a:hover { background: rgb(255 255 255 / 0.1); }
+    .foot__ico { width: 1.25rem; height: 1.25rem; fill: currentColor; }
+    .foot__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    /* Copyright: one centred line; if it must wrap, it breaks after the
+       dot, never before it. */
+    .foot__legal {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      column-gap: 0.35em;
+      text-align: center;
+    }
+    .foot__legal > span { white-space: nowrap; }
+  }
+
+  /* ---- Tablet and desktop: brand | pages | contact ---- */
+  @media (min-width: 45em) {
+    .foot__in {
+      max-width: var(--content-max);
+      margin-inline: auto;
+      padding: var(--space-12) var(--gutter) var(--space-8);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      column-gap: clamp(2.5rem, 7vw, 6rem);
+    }
+    .foot__list { display: grid; }
+    .foot__ico { display: none; }
+    .foot__contact a:hover { text-decoration-line: underline; }
+    .foot__legal {
+      max-width: var(--content-max);
+      margin-inline: auto;
+    }
   }
 </style>
