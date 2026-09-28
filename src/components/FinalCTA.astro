@@ -1,0 +1,244 @@
+---
+import site from '../data/site.json';
+import { messengerFor } from '../lib/messenger';
+import { Image } from 'astro:assets';
+import Confetti from './Confetti.astro';
+import { img } from '../lib/images';
+
+interface Props { heading?: string; body?: string }
+const {
+  heading = 'Handa ka na?',
+  body = "Message us with your date and headcount. We'll take it from there.",
+} = Astro.props as Props;
+---
+
+{/*
+  The page's send-off: a full-bleed deep-red band scattered with confetti.
+  The hero owns the banderitas; this end of the page gets its own ornament
+  so the two don't repeat each other.
+
+  Beside the pitch, a Messenger-style chat card previews the message the
+  button opens with (the "order" prefill from site.json), so tapping it
+  isn't a leap into the unknown. It's an illustration — the prefill isn't
+  guaranteed to arrive (SPEC.md §4) — so it's hidden from assistive tech
+  and nothing depends on it; the button label stands on its own.
+
+  Phones and tablets: one centred column. Desktop (56em, as the header): the pitch left, the chat and its
+  button right, with the lead time right under the button (CLAUDE.md).
+*/}
+<section class="section final" aria-labelledby="final-h">
+  <Confetti clear />
+  <div class="wrap final__in">
+    <div class="final__copy">
+      <h2 class="final__h" id="final-h">{heading}</h2>
+      <p class="final__p">{body}</p>
+    </div>
+
+    <div class="final__act">
+      <div class="chat" aria-hidden="true">
+        <div class="chat__head">
+          {/* The owner's photo, as on the Facebook page. The chat card is
+              hidden from assistive tech, so no alt text is needed. */}
+          <Image
+            src={img('owner-avatar.jpg')}
+            alt=""
+            width={72}
+            height={72}
+            densities={[1, 2]}
+            format="webp"
+            loading="lazy"
+            class="chat__avatar"
+          />
+          <span class="chat__who">
+            <strong>{site.name}</strong>
+            <span>{site.ordering.channel}</span>
+          </span>
+        </div>
+        <div class="chat__body">
+          <p class="chat__msg chat__msg--out">{site.messengerPrefill.order}</p>
+          <p class="chat__msg chat__msg--in chat__typing"><span></span><span></span><span></span></p>
+        </div>
+      </div>
+
+      <a class="btn btn--onDark final__btn" target="_blank" rel="noopener" href={messengerFor('order')}>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.14.26.35.27.57l.05 1.78c.02.57.6.94 1.12.71l1.98-.87c.17-.08.36-.09.53-.04.91.25 1.87.38 2.91.38 5.64 0 10-4.13 10-9.7S17.64 2 12 2Zm6 7.46-2.94 4.66c-.47.74-1.47.93-2.17.4l-2.34-1.75a.6.6 0 0 0-.72 0l-3.16 2.4c-.42.32-.97-.18-.69-.63l2.94-4.66c.47-.74 1.47-.93 2.17-.4l2.34 1.75a.6.6 0 0 0 .72 0l3.16-2.4c.42-.32.97.18.69.63Z" />
+        </svg>
+        Order via Messenger
+      </a>
+      <p class="leadtime leadtime--onDark final__lead">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <rect x="4" y="5" width="16" height="15" rx="2" />
+          <path d="M4 9.5h16M8 3v3.5M16 3v3.5M9.5 14.2l1.8 1.8 3.2-3.4" />
+        </svg>
+        {site.ordering.leadTime}
+      </p>
+      <p class="final__call">Or call <a href={site.contact.phoneHref}>{site.contact.phone}</a></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .final {
+    --final-gap: clamp(2rem, 8vw, 7rem);
+    background: var(--color-bg-inverse-deep);
+    color: var(--color-text-inverse);
+    /* Keep the confetti to the margins and the padding: the clear box is
+       the content column, plus a little air. */
+    /* Phones and tablets: the centred column is at most ~24rem wide (the
+       pitch's 34ch, the 22rem chat), so clear that plus 1rem of air. On a
+       phone that's the whole width; on a tablet the side margins open up
+       for confetti instead of sitting bare. */
+    --confetti-clear-x: min(50% - var(--gutter) + 0.25rem, 13rem);
+    --confetti-clear-y: calc(var(--section-y) - 0.5rem);
+  }
+  /* Above the confetti. */
+  .final__in {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: var(--space-8);
+    text-align: center;
+  }
+  .final__h {
+    font-style: italic;
+    font-weight: var(--weight-medium);
+    font-size: var(--text-3xl);
+    line-height: 1.05;
+  }
+  .final__p {
+    max-width: 34ch;
+    margin: var(--space-4) auto 0;
+    font-size: var(--text-lg);
+    opacity: 0.9;
+    text-wrap: pretty;
+  }
+
+  /* The chat, its button, then the terms — one column the chat's width. */
+  .final__act {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-4);
+    width: min(100%, 22rem);
+  }
+  .final__btn {
+    width: 100%;
+    font-size: var(--text-lg);
+    min-height: 3.25rem;
+    padding-inline: 1.75rem;
+    box-shadow: 0 6px 18px -6px rgb(0 0 0 / 0.4);
+  }
+  .final__btn svg { width: 1.25em; height: 1.25em; fill: currentColor; flex: none; }
+
+  .final__lead svg {
+    width: 1.1em;
+    height: 1.1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex: none;
+  }
+
+  .final__call { font-size: var(--text-sm); opacity: 0.85; }
+  .final__call a {
+    color: var(--color-accent);
+    font-weight: var(--weight-bold);
+    white-space: nowrap;
+    text-underline-offset: 0.2em;
+  }
+
+  /* ---- Chat preview ---- */
+  .chat {
+    width: 100%;
+    margin-bottom: var(--space-2);
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    text-align: left;
+    font-size: var(--text-sm);
+  }
+  .chat__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .chat :global(.chat__avatar) {
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .chat__who { display: grid; line-height: 1.25; }
+  .chat__who span { font-size: var(--text-xs); color: var(--color-text-muted); }
+
+  .chat__body {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4);
+  }
+  .chat__msg {
+    max-width: 85%;
+    padding: 0.6rem 0.9rem;
+    border-radius: 1.1rem;
+    line-height: 1.4;
+  }
+  .chat__msg--out {
+    white-space: pre-line;
+    justify-self: end;
+    background: var(--color-chat-out);
+    color: var(--color-text-inverse);
+    border-bottom-right-radius: 0.3rem;
+  }
+  .chat__msg--in {
+    justify-self: start;
+    background: var(--color-bg-sunken);
+    border-bottom-left-radius: 0.3rem;
+  }
+
+  /* A reply on its way. Bounces a few times and rests — nothing beside an
+     order button keeps moving. */
+  .chat__typing { display: flex; gap: 4px; padding: 0.8rem 0.9rem; }
+  .chat__typing span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-text-muted);
+    animation: chat-typing 1.2s ease-in-out 3;
+  }
+  .chat__typing span:nth-child(2) { animation-delay: 0.15s; }
+  .chat__typing span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes chat-typing {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-3px); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chat__typing span { animation: none; }
+  }
+
+  /* ---- Desktop: pitch | chat ---- */
+  @media (min-width: 56em) {
+    /* The two columns and their gap, as laid out below. */
+    .final {
+      --confetti-clear-x: calc(min(50% - var(--gutter), (52rem + var(--final-gap)) / 2) + 1rem);
+    }
+    /* Two sized columns, centred as a pair, so the pitch and the chat
+       stay close instead of pinned to opposite edges of the page. */
+    .final__in {
+      grid-template-columns: minmax(0, 30rem) 22rem;
+      justify-content: center;
+      align-items: center;
+      justify-items: start;
+      column-gap: var(--final-gap);
+      text-align: left;
+    }
+    .final__p { margin-inline: 0; }
+  }
+</style>

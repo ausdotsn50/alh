@@ -1,0 +1,179 @@
+---
+import { Image } from 'astro:assets';
+import { img } from '../lib/images';
+
+/* Loro-style feature: copy left; on the right the pit photo in an arch —
+   the shape of a pugon's mouth — with "Lutong uling · Hindi pinamadali"
+   lettered along its crown like the inscription over a furnace, and a
+   smaller photo of the finished lechon overlapping its bottom-left. The
+   lettering repeats the eyebrow line, so it is hidden from assistive tech.
+   Both photos sit on the cream page (DESIGN.md). */
+const crown = 'Lutong uling · Hindi pinamadali';
+---
+
+<section class="section wrap">
+  <div class="roast">
+    <div class="roast__txt">
+      <p class="eyebrow">Lutong uling, hindi pinamadali</p>
+      <h2 class="roast__h">Wood-fired, not rushed</h2>
+      <p class="roast__p">
+        Every order is roasted over wood on the day it's needed. That's why we ask for <span class="nobr">2–3 days'</span>{' '}
+        notice — we're not pulling something out of storage, we're cooking for your date
+        specifically. The skin gets its crackle from time over the fire, and there's no shortcut
+        for that.
+      </p>
+    </div>
+
+    <div class="roast__media">
+      <div class="roast__arch">
+      <Image
+        src={img('lechon-pit-roasting.jpg')}
+        alt="A whole lechon on a metal spit resting over a bed of glowing coals and white ash in a block-walled pit, split firewood stacked alongside and smoke drifting up."
+        widths={[480, 720, 1000]}
+        width={1000}
+        sizes="(min-width: 56em) 30rem, 80vw"
+        format="webp"
+        loading="lazy"
+        class="roast__main"
+      />
+      {/* Drawn on the arch's own 400 x 500 box, so it scales with it. The
+          crown is a semicircle of radius 200 centred at (200, 200); the
+          lettering runs on a concentric path 14 units outside it. */}
+      <svg class="roast__crown" viewBox="0 0 400 500" aria-hidden="true" focusable="false">
+        <path id="roast-crown" d="M -14,200 A 214,214 0 0 1 414,200" fill="none" />
+        <text class="roast__crown-text">
+          <textPath href="#roast-crown" startOffset="50%" text-anchor="middle">{crown}</textPath>
+        </text>
+      </svg>
+      </div>
+      <Image
+        src={img('whole-lechon-spit-roast.jpg')}
+        alt="Close view of a finished whole lechon on the spit, its skin roasted a deep glossy amber."
+        widths={[320, 480]}
+        width={480}
+        sizes="(min-width: 56em) 14rem, 40vw"
+        format="webp"
+        loading="lazy"
+        class="roast__inset"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* ---- Phones: one centred column — the arch, then the copy ----
+     Symmetric side padding keeps the arch on the page's centre line; the
+     inset hangs into the left padding. The copy is centred like the other
+     phone sections. */
+  .roast {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+  }
+  .roast__media {
+    position: relative;
+    order: -1;
+    width: min(100%, 22rem);
+    margin-inline: auto;
+    /* Room for the crown lettering above and the inset to hang below. */
+    padding: 2.25rem 1.5rem 2.5rem;
+  }
+  .roast__txt { text-align: center; }
+  .nobr { white-space: nowrap; }
+  /* Centred body copy needs a shorter measure to stay easy to scan. */
+  .roast__txt .roast__p { margin-inline: auto; max-width: 55ch; text-wrap: pretty; }
+  /* The crown already says this line right above; keep it for screen
+     readers (the crown is hidden from them) but not twice on screen. */
+  .roast__txt .eyebrow {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .roast__arch { position: relative; }
+
+  /* Arch: fully rounded top, softly rounded bottom. */
+  .roast__media :global(.roast__main) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 55% 60%;
+    border-radius: 999px 999px var(--radius-lg) var(--radius-lg);
+  }
+  /* Inset: a rounded square overlapping the arch's bottom-left, with a
+     cream ring so it reads as laid on top rather than cut in. */
+  .roast__media :global(.roast__inset) {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 44%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 1.75rem;
+    border: 6px solid var(--color-bg);
+    box-shadow: var(--shadow-card);
+  }
+  /* Crown lettering: follows the arch outside its top edge. */
+  .roast__crown {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .roast__crown-text {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: 17px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    fill: var(--color-brand);
+  }
+
+  .roast__h {
+    font-size: clamp(2.25rem, 1.4rem + 3.4vw, 3.75rem);
+    font-weight: var(--weight-black);
+    line-height: 1.02;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-6);
+    text-wrap: balance;
+  }
+  .roast__p {
+    color: var(--color-text-muted);
+    max-width: 36ch;
+  }
+
+  /* ---- Desktop: copy | photos ---- */
+  @media (min-width: 56em) {
+    /* Two sized columns, centred as a pair, so the copy sits close to
+       the arch instead of across a wide gutter. */
+    .roast {
+      grid-template-columns: minmax(0, 24rem) minmax(0, 27rem);
+      justify-content: center;
+      gap: clamp(1.5rem, 3vw, 3rem);
+    }
+    .roast__media {
+      order: 0;
+      width: 100%;
+      margin: 0;
+      padding: 2.5rem 0 4rem 3rem;
+    }
+    .roast__txt { text-align: left; }
+    .roast__txt .roast__p { margin-inline: 0; max-width: 36ch; }
+    .roast__txt .eyebrow {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      white-space: normal;
+    }
+  }
+</style>

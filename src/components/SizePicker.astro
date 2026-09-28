@@ -1,0 +1,319 @@
+---
+import { Image } from 'astro:assets';
+import menu from '../data/menu.json';
+import site from '../data/site.json';
+import { peso } from '../lib/format';
+import { messengerForSize } from '../lib/messenger';
+import { img } from '../lib/images';
+import type { Product } from '../lib/types';
+
+/**
+ * SizePicker — one card per product: photo, name and weight basis, a row
+ * of size buttons, then the chosen size's price and pax and a single
+ * Order button for exactly that size (Messenger, prefilled). Both cards
+ * share one structure, so they line up whatever the size counts.
+ *
+ * No script. Each size is a radio, its label (the button) and its panel,
+ * as siblings in a grid: labels auto-place along row 1, every panel sits
+ * in the same cell in row 2, and `:checked + label + .panel` shows the
+ * chosen one. That works in every browser — no :has needed.
+ *
+ * Each size button's accessible name carries its pax and price, so a
+ * screen reader hears the answer on the button itself rather than
+ * relying on the visual panel changing. Every figure comes from menu.json.
+ *
+ * Below 56em, where the cards would stack, a two-option switch above them
+ * shows one product at a time, so the section is one card long instead of
+ * two. Same technique (native radios), plus :has to hide the other card;
+ * where :has is unsupported the switch hides and both cards stack.
+ */
+const products = menu.products as Product[];
+---
+
+<section class="section wrap picker" aria-labelledby="picker-h">
+  <header class="picker__head">
+    <p class="eyebrow">Ano'ng gusto mo?</p>
+    <h2 class="h2" id="picker-h">Two things, done properly</h2>
+    <p class="picker__lede">Pick a size to see who it feeds and what it costs.</p>
+  </header>
+
+  <fieldset class="picker__switch">
+    <legend class="visually-hidden">Show</legend>
+    {products.map((p, i) => (
+      <>
+        <input
+          class="visually-hidden"
+          type="radio"
+          name="picker-product"
+          id={`pick-${p.id}`}
+          checked={i === 0}
+        />
+        <label for={`pick-${p.id}`}>{p.name}</label>
+      </>
+    ))}
+  </fieldset>
+
+  <div class="picker__grid">
+    {products.map((p) => (
+      <article class="pcard" data-product={p.id} aria-labelledby={`pcard-${p.id}`}>
+        <div class="pcard__photo">
+          <Image
+            src={img(p.image)}
+            alt={p.imageAlt}
+            widths={[420, 640, 860]}
+            width={860}
+            sizes="(min-width: 56em) 29rem, (min-width: 34em) 30rem, 90vw"
+            format="webp"
+            loading="lazy"
+            class="pcard__img"
+            data-focus={p.imageFocus}
+          />
+        </div>
+
+        <div class="pcard__body">
+          <h3 class="pcard__h" id={`pcard-${p.id}`}>{p.name}</h3>
+          <p class="pcard__blurb">{p.blurb}</p>
+
+          <fieldset class="sizes" style={`--n:${p.sizes.length}`}>
+            <legend class="sizes__legend">Size · {p.weightBasis}</legend>
+            {p.sizes.map((s, i) => {
+              const id = `size-${p.id}-${s.weightKg}`;
+              return (
+                <>
+                  <input
+                    class="visually-hidden"
+                    type="radio"
+                    name={`size-${p.id}`}
+                    id={id}
+                    checked={i === 0}
+                  />
+                  <label class="sizes__btn" for={id}>
+                    {s.weightLabel}
+                    <span class="visually-hidden">, {s.servesLabel}, {peso(s.price)}</span>
+                  </label>
+                  <div class="sizes__panel">
+                    <p class="sizes__line">
+                      <span class="sizes__price">{peso(s.price)}</span>
+                      <span class="sizes__pax">serves {s.servesLabel}</span>
+                    </p>
+                    {p.freebie && <p class="sizes__free">+ {p.freebie.replace(/^Comes with /i, '')}</p>}
+                    <a class="btn btn--primary sizes__order" target="_blank" rel="noopener" href={messengerForSize(p, s)}>
+                      Order {s.weightLabel} {p.name.toLowerCase()}
+                    </a>
+                  </div>
+                </>
+              );
+            })}
+          </fieldset>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <p class="picker__note">
+    {site.ordering.leadTime} · {site.delivery.short} ·{' '}
+    <a href="/order">Full price list</a>
+  </p>
+</section>
+
+<style>
+  .picker__head { text-align: center; margin-bottom: var(--space-8); }
+  .picker__lede {
+    margin-top: var(--space-2);
+    color: var(--color-text-muted);
+    text-wrap: balance;
+  }
+
+  /* Side by side only once each card is wide enough for five size
+     buttons with real labels; below that, stacked at a readable width. */
+  .picker__grid {
+    display: grid;
+    gap: var(--space-6);
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+  @media (min-width: 56em) {
+    .picker__grid { grid-template-columns: 1fr 1fr; gap: var(--space-8); max-width: 58rem; }
+  }
+
+  /* ---- Product switch (stacked layouts only) ---- */
+  .picker__switch { display: none; border: 0; padding: 0; margin: 0; }
+  @supports selector(:has(*)) {
+    @media (max-width: 55.999em) {
+      .picker__switch {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        max-width: 30rem;
+        margin: 0 auto var(--space-4);
+        padding: 4px;
+        background: var(--surface-2);
+        border-radius: var(--radius-pill);
+      }
+      .picker__switch label {
+        display: grid;
+        place-items: center;
+        min-height: var(--tap-min);
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        cursor: pointer;
+        transition: var(--transition);
+      }
+      .picker__switch input:checked + label {
+        background: var(--color-text);
+        color: var(--color-bg);
+      }
+      .picker__switch input:focus-visible + label {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 2px;
+      }
+      .picker:has(#pick-whole-lechon:checked) .pcard:not([data-product='whole-lechon']),
+      .picker:has(#pick-lechon-belly:checked) .pcard:not([data-product='lechon-belly']) {
+        display: none;
+      }
+    }
+  }
+
+  /* ---- Card ----
+     Type hierarchy, four levels, red only for what you can tap:
+       1. name       28px Fraunces      — leads the card
+       2. price      24px Fraunces ink  — the answer, beside its pax
+       3. body       16px muted         — blurb, pax
+       4. labels     12px caps muted    — "Size · live weight"
+     The selected size is an ink fill, so the Order button is the one red
+     thing on the card. Spacing on an 8px rhythm: tight inside a group,
+     24px between groups. */
+  .pcard {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+  }
+  .pcard__photo {
+    overflow: hidden;
+    border-radius: calc(var(--radius-lg) - 6px);
+  }
+  .pcard :global(.pcard__img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .pcard :global(.pcard__img[data-focus='top']) { object-position: center 20%; }
+
+  .pcard__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: var(--space-6) var(--space-3) var(--space-3);
+  }
+  .pcard__h {
+    font-size: 1.75rem;
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+  .pcard__blurb {
+    margin-top: var(--space-2);
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    max-width: 40ch;
+  }
+
+  /* ---- Sizes: buttons on row 1, the chosen panel on row 2 ---- */
+  .sizes {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    grid-template-rows: auto auto 1fr;
+    gap: var(--space-2);
+    margin: var(--space-6) 0 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+  .sizes__legend {
+    grid-column: 1 / -1;
+    padding: 0;
+    margin-bottom: var(--space-2);
+    font-size: 0.75rem;
+    font-weight: var(--weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+  }
+  .sizes__btn {
+    grid-row: 1;
+    display: grid;
+    place-items: center;
+    min-height: var(--tap-min);
+    background: var(--surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .sizes__btn:hover { border-color: var(--color-text); }
+  input:checked + .sizes__btn {
+    background: var(--color-text);
+    border-color: var(--color-text);
+    color: var(--color-bg);
+  }
+  input:focus-visible + .sizes__btn {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .sizes__panel {
+    grid-row: 2 / 4;
+    grid-column: 1 / -1;
+    display: none;
+    flex-direction: column;
+    padding-top: var(--space-5, 1.25rem);
+  }
+  input:checked + .sizes__btn + .sizes__panel { display: flex; }
+
+  .sizes__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-3);
+  }
+  .sizes__price {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: 1.5rem;
+    line-height: 1.1;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .sizes__pax { font-size: var(--text-base); color: var(--color-text-muted); }
+  .sizes__free {
+    margin-top: var(--space-1);
+    font-size: var(--text-base);
+    color: var(--color-text);
+  }
+  .sizes__order {
+    margin-top: auto;
+    width: 100%;
+  }
+  /* Room above the button even when there's no freebie line. */
+  .sizes__panel > :nth-last-child(2) { margin-bottom: var(--space-6); }
+
+  .picker__note {
+    margin-top: var(--space-8);
+    text-align: center;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-wrap: balance;
+  }
+  .picker__note a { color: var(--color-brand); }
+</style>

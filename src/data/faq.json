@@ -1,0 +1,71 @@
+{
+  "_note": "status: \"approved\" entries render and enter FAQPage JSON-LD. status: \"blocked\" entries are filtered out of both — they are parked here so the open question stays visible in source. Do not flip one to approved without the owner's answer.",
+  "items": [
+    {
+      "id": "lead-time",
+      "status": "approved",
+      "q": "How far in advance should I order?",
+      "a": "At least 2–3 days. We roast over wood for your date specifically, so we need the time to prepare. For fiesta season, Christmas and New Year, book earlier — those dates fill up fast."
+    },
+    {
+      "id": "delivery-area",
+      "status": "approved",
+      "q": "Do you deliver?",
+      "a": "Yes — free anywhere within Allen, Northern Samar. For anywhere outside Allen, message us and we'll see what we can do."
+    },
+    {
+      "id": "sizing",
+      "status": "approved",
+      "q": "What size do I need?",
+      "a": "Tell us your pax count in Messenger and we'll advise. As a guide, lechon belly serves 5–20 pax and whole lechon serves 20–70 pax."
+    },
+    {
+      "id": "weight-basis",
+      "status": "approved",
+      "q": "Why is belly priced by raw weight and whole lechon by live weight?",
+      "a": "They are two different measures. Lechon belly is quoted by its raw weight before roasting. Whole lechon is quoted by the pig's live weight. When you compare the two price lists, you are comparing different bases — so go by the pax count, not by price per kilo."
+    },
+    {
+      "id": "whats-included",
+      "status": "approved",
+      "q": "What comes with a whole lechon order?",
+      "a": "Every whole lechon comes with dinuguan, free. Lechon belly orders do not include the dinuguan freebie."
+    },
+    {
+      "id": "payment",
+      "status": "approved",
+      "q": "How do I pay?",
+      "a": "By GCash, using the QR code on our Contact page. Wait for us to confirm your order and date in Messenger before sending anything. Before you send, check the account name shows as AN***A DE***E A."
+    },
+    {
+      "id": "deposit",
+      "status": "blocked",
+      "q": "Do you need a downpayment?",
+      "a": "TODO(owner): confirm the deposit split. Draft text says 50% to reserve the date, balance on delivery — this has not been confirmed."
+    },
+    {
+      "id": "cancellation",
+      "status": "blocked",
+      "q": "Can I cancel or move my date?",
+      "a": "TODO(owner): no cancellation or date-change policy has been supplied."
+    },
+    {
+      "id": "pickup",
+      "status": "blocked",
+      "q": "Can I pick it up instead?",
+      "a": "TODO(owner): TASKS.md marks this answered, but the answer was never written down. Is pickup offered, and is the street address publishable?"
+    },
+    {
+      "id": "chopped",
+      "status": "blocked",
+      "q": "Is it delivered chopped or whole?",
+      "a": "TODO(owner): TASKS.md marks this answered, but the answer was never written down."
+    },
+    {
+      "id": "operating-days",
+      "status": "blocked",
+      "q": "Which days do you roast?",
+      "a": "TODO(owner): are there days the business does not roast?"
+    }
+  ]
+}

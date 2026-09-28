@@ -1,0 +1,69 @@
+{
+  "name": "Alzar's Lechon Haus",
+  "tagline": "Lutong uling, handa sa handaan.",
+  "shortDescription": "Wood-fired whole lechon and lechon belly, roasted fresh for your date.",
+  "location": {
+    "locality": "Allen",
+    "region": "Northern Samar",
+    "country": "Philippines",
+    "countryCode": "PH",
+    "label": "Allen, Northern Samar"
+  },
+  "contact": {
+    "phone": "+63 998 059 0903",
+    "phoneHref": "tel:+639980590903",
+    "facebookPageId": "61585422270834",
+    "facebookUrl": "https://www.facebook.com/profile.php?id=61585422270834",
+    "messengerBase": "https://m.me/61585422270834"
+  },
+  "ordering": {
+    "leadTime": "2–3 days advance order",
+    "leadTimeShort": "2–3 days",
+    "leadTimeLong": "Please order at least 2–3 days ahead — we roast fresh, so we need time to prepare.",
+    "channel": "Facebook Messenger"
+  },
+  "delivery": {
+    "freeWithin": "Allen, Northern Samar",
+    "short": "Free delivery within Allen, Northern Samar",
+    "outsideNote": "We deliver within Allen. For anywhere outside Allen, message us and we'll see what we can do."
+  },
+  "payment": {
+    "method": "GCash",
+    "qrAccountNameMasked": "AN***A DE***E A.",
+    "confirmFirst": "Please wait for us to confirm your order and date in Messenger before sending any payment.",
+    "depositPolicy": {
+      "status": "draft",
+      "text": "We ask for a 50% downpayment to reserve your date, with the balance due on delivery by GCash or cash."
+    },
+    "feesNote": "Transfer fees may apply depending on your bank or e-wallet.",
+    "scanNote": "The QR is shown at the size it was supplied, so scanning it straight off this screen may not work. Tap the code to open it full size, save it to your phone, then in GCash choose Scan QR and pick it from your gallery.",
+    "qrIsFullScreenshot": true
+  },
+  "nav": [
+    {
+      "label": "Menu",
+      "href": "/order"
+    },
+    {
+      "label": "About",
+      "href": "/order"
+    },
+    {
+      "label": "Contact",
+      "href": "/order"
+    }
+  ],
+  "messengerPrefill": {
+    "generic": "Hi Alzar's Lechon Haus! I want to make an order.\n\nType: [whole lechon or lechon belly]\nDate: [date of your event]\nHeadcount: [number of guests]",
+    "whole": "Hi Alzar's Lechon Haus! I'm interested in a whole lechon. Can you help me pick a size?",
+    "belly": "Hi Alzar's Lechon Haus! I'm interested in lechon belly. Can you help me pick a size?",
+    "sizing": "Hi Alzar's Lechon Haus! I'm not sure what size I need. Can you help me work it out?",
+    "order": "Hi Alzar's Lechon Haus! I'd like to order lechon.\n\nDate: [date needed]\nHeadcount: [number of guests]\n\nWhat size would you suggest?"
+  },
+  "seo": {
+    "siteUrl": "https://alzars-lechon-haus.netlify.app",
+    "siteUrlIsProvisional": true,
+    "defaultOgImage": "/og-default.jpg",
+    "locale": "en_PH"
+  }
+}

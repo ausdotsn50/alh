@@ -1,0 +1,305 @@
+---
+/**
+ * Banderitas — the flyer's pennant bunting, the page's one piece of ornament.
+ * Purely decorative, so it is hidden from assistive tech.
+ * The deco tokens exist for this and nothing else (DESIGN.md).
+ *
+ * Variants
+ *   canopy — two long strands sweeping across the top from off-frame.
+ *            Default; used on every page's opening section.
+ *   swags  — a U-swag from each top corner, centre left open.
+ *   street — repeating scallops across the full width, fiesta-street style.
+ *   strip  — the original flat pennant row, in normal flow, for use as a
+ *            section divider.
+ *
+ * The first three are overlays: place them as a DIRECT CHILD of the section
+ * they decorate. The parent gets position/clip and a `--bunting-drop` custom
+ * property (the bunting's rendered height) via the :has() rules below, and
+ * reserves that much top space itself — see `.section:has(> .bunting)` in
+ * global.css and `.hero__in` in Hero.astro. The overlay never covers text.
+ *
+ * Phones get their own artboard with fewer, larger flags instead of the
+ * desktop set shrunk to slivers.
+ */
+interface Props {
+  variant?: 'canopy' | 'swags' | 'street' | 'strip';
+  /** Ground the flags sit on. `dark` swaps red-orange for cream, which
+   *  otherwise disappears against the red. */
+  tone?: 'dark' | 'light';
+  /** Flags on the front strand at desktop width; every other strand, and
+   *  the phone layout, scale in proportion. Omit for the designed density. */
+  flags?: number;
+  /** Pennant size. The bunting's overall height stays the same. */
+  size?: 'sm' | 'md' | 'lg';
+  /** One gentle settle on load. Always off under prefers-reduced-motion. */
+  sway?: boolean;
+  /** strip only: point the pennants up. */
+  flip?: boolean;
+}
+const {
+  variant = 'canopy',
+  tone = variant === 'strip' ? 'light' : 'dark',
+  flags,
+  size = 'md',
+  sway = true,
+  flip = false,
+} = Astro.props as Props;
+
+const palette = tone === 'dark' ? ['deco-1', 'deco-4', 'deco-3'] : ['deco-2', 'deco-1', 'deco-3'];
+const fill = (i: number) => `var(--color-${palette[i % palette.length]})`;
+const sizeScale = { sm: 0.8, md: 1, lg: 1.2 }[size];
+
+type Pt = [number, number];
+interface Flag { points: string; shade: string; fill: string; i: number }
+interface Strand { cord: string; flags: Flag[] }
+interface StrandSpec {
+  /** Tie points — usually just outside the artboard, so the cord enters
+   *  from off-frame the way bunting strung across a street does. */
+  from: Pt;
+  to: Pt;
+  /** How far the middle of the cord droops below the straight line. */
+  sag: number;
+  /** Pennant width; the designed count follows the cord length. */
+  flagW: number;
+  /** Colour offset, so stacked strands don't line up colour-for-colour. */
+  offset: number;
+}
+
+const r = (n: number) => Math.round(n * 10) / 10;
+
+/** A quadratic sag with its arc length tabulated, so flags can be spaced
+ *  evenly along the cord rather than evenly in x. */
+function cord(spec: StrandSpec) {
+  const [x0, y0] = spec.from;
+  const [x2, y2] = spec.to;
+  const c: Pt = [(x0 + x2) / 2, (y0 + y2) / 2 + 2 * spec.sag];
+  const at = (t: number): Pt => [
+    (1 - t) ** 2 * x0 + 2 * (1 - t) * t * c[0] + t * t * x2,
+    (1 - t) ** 2 * y0 + 2 * (1 - t) * t * c[1] + t * t * y2,
+  ];
+  const N = 240;
+  const pts: Pt[] = [at(0)];
+  const len = [0];
+  for (let i = 1; i <= N; i++) {
+    const p = at(i / N);
+    const q = pts[i - 1];
+    len.push(len[i - 1] + Math.hypot(p[0] - q[0], p[1] - q[1]));
+    pts.push(p);
+  }
+  const pointAt = (s: number): Pt => {
+    const j = Math.max(1, len.findIndex((v) => v >= s));
+    const k = (s - len[j - 1]) / (len[j] - len[j - 1] || 1);
+    return [pts[j - 1][0] + (pts[j][0] - pts[j - 1][0]) * k, pts[j - 1][1] + (pts[j][1] - pts[j - 1][1]) * k];
+  };
+  return { L: len[N], pointAt, d: `M${r(x0)} ${r(y0)} Q${r(c[0])} ${r(c[1])} ${r(x2)} ${r(y2)}` };
+}
+
+const designedCount = (spec: StrandSpec) => Math.max(1, Math.floor(cord(spec).L / (spec.flagW * 1.3)));
+
+/** Each pennant's top edge follows the cord; its tip hangs straight down,
+ *  and a darker half reads as the fold. */
+function strand(spec: StrandSpec, countFactor: number, indexFrom: number): Strand {
+  const { L, pointAt, d } = cord(spec);
+  const count = Math.max(2, Math.round(designedCount(spec) * countFactor));
+  const step = L / count;
+  const w = Math.min(spec.flagW * sizeScale, step * 0.85);
+  const h = w * 1.2;
+  const lead = (step - w) / 2;
+  const pts = (...ps: Pt[]) => ps.map((p) => `${r(p[0])},${r(p[1])}`).join(' ');
+
+  const out: Flag[] = Array.from({ length: count }, (_, k) => {
+    const a = pointAt(k * step + lead);
+    const b = pointAt(k * step + lead + w);
+    const mid: Pt = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    const tip: Pt = [mid[0], mid[1] + h];
+    return { points: pts(a, b, tip), shade: pts(mid, b, tip), fill: fill(k + spec.offset), i: indexFrom + k };
+  });
+  return { cord: d, flags: out };
+}
+
+/* Artboards are sized like the screens they serve (1440 wide, 360 narrow),
+   so units read as pixels there. Strands are listed back to front; the last
+   is the front strand. Artboard h / w is mirrored in the host --bunting-drop
+   rules below — change them together. */
+interface Artboard { w: number; h: number; strands: StrandSpec[] }
+const mirror = (st: StrandSpec, W: number): StrandSpec =>
+  ({ ...st, from: [W - st.from[0], st.from[1]], to: [W - st.to[0], st.to[1]], offset: st.offset + 1 });
+const withMirror = (a: Artboard): Artboard => ({ ...a, strands: [...a.strands, ...a.strands.map((st) => mirror(st, a.w))] });
+
+const SCENES: Record<'canopy' | 'swags' | 'street', { wide: Artboard; narrow: Artboard }> = {
+  canopy: {
+    wide: { w: 1440, h: 210, strands: [
+      { from: [-40, -16], to: [980, -16], sag: 58, flagW: 32, offset: 1 },
+      { from: [-80, 60], to: [1520, -30], sag: 96, flagW: 44, offset: 0 },
+    ] },
+    narrow: { w: 360, h: 96, strands: [
+      { from: [-20, -8], to: [250, -8], sag: 22, flagW: 18, offset: 1 },
+      { from: [-30, 26], to: [400, -14], sag: 36, flagW: 24, offset: 0 },
+    ] },
+  },
+  swags: {
+    wide: withMirror({ w: 1440, h: 150, strands: [
+      { from: [-50, -12], to: [440, -12], sag: 34, flagW: 28, offset: 1 },
+      { from: [-70, 24], to: [620, -14], sag: 62, flagW: 38, offset: 0 },
+    ] }),
+    narrow: withMirror({ w: 360, h: 78, strands: [
+      { from: [-24, 4], to: [172, -8], sag: 26, flagW: 22, offset: 0 },
+    ] }),
+  },
+  street: {
+    wide: { w: 1440, h: 130, strands: [
+      { from: [200, -8], to: [720, -8], sag: 30, flagW: 26, offset: 2 },
+      { from: [720, -8], to: [1240, -8], sag: 30, flagW: 26, offset: 1 },
+      { from: [-60, -8], to: [480, -8], sag: 58, flagW: 36, offset: 0 },
+      { from: [480, -8], to: [960, -8], sag: 58, flagW: 36, offset: 1 },
+      { from: [960, -8], to: [1500, -8], sag: 58, flagW: 36, offset: 2 },
+    ] },
+    narrow: { w: 360, h: 74, strands: [
+      { from: [-20, -6], to: [180, -6], sag: 26, flagW: 22, offset: 0 },
+      { from: [180, -6], to: [380, -6], sag: 26, flagW: 22, offset: 1 },
+    ] },
+  },
+};
+
+const sets: { box: Artboard; strands: Strand[]; cls: string }[] = [];
+if (variant !== 'strip') {
+  const scene = SCENES[variant];
+  const front = scene.wide.strands[scene.wide.strands.length - 1];
+  const countFactor = flags ? Math.max(3, flags) / designedCount(front) : 1;
+  for (const [box, cls] of [[scene.wide, 'bunting__svg--wide'], [scene.narrow, 'bunting__svg--narrow']] as const) {
+    let i = 0;
+    const strands = box.strands.map((st) => {
+      const out = strand(st, countFactor, i);
+      i += out.flags.length;
+      return out;
+    });
+    sets.push({ box, strands, cls });
+  }
+}
+
+const stripFlags = Array.from({ length: Math.max(3, flags ?? 12) }, (_, i) => ({ x: i * 10, fill: fill(i) }));
+const stripW = stripFlags.length * 10;
+---
+
+{variant === 'strip' ? (
+  <svg
+    class:list={['banderitas', flip && 'banderitas--flip']}
+    viewBox={`0 0 ${stripW} 22`}
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    role="presentation"
+  >
+    <rect x="0" y="0" width={stripW} height="22" fill={tone === 'dark' ? 'var(--color-bg-inverse)' : 'var(--color-bg)'}></rect>
+    {stripFlags.map((f) => (
+      <polygon points={`${f.x},0 ${f.x + 8},0 ${f.x + 4},14`} fill={f.fill}></polygon>
+    ))}
+  </svg>
+) : (
+  <div
+    class:list={['bunting', `bunting--${variant}`, `bunting--${tone}`, sway && 'bunting--sway']}
+    aria-hidden="true"
+  >
+    {sets.flatMap((set) =>
+      /* Swags never cross the centre, so each corner gets its own SVG
+         (a half-width viewBox onto the same artboard). That lets the two
+         corners cap their size on very wide screens (a big monitor, or the
+         page zoomed out) instead of growing with the viewport and hanging
+         over the capped hero dish; the open centre simply widens. At
+         ordinary widths it renders exactly as one full-width SVG did. */
+      variant === 'swags'
+        ? [
+            { ...set, cls: `${set.cls} bunting__svg--left`, vb: `0 0 ${set.box.w / 2} ${set.box.h}` },
+            { ...set, cls: `${set.cls} bunting__svg--right`, vb: `${set.box.w / 2} 0 ${set.box.w / 2} ${set.box.h}` },
+          ]
+        : [{ ...set, vb: `0 0 ${set.box.w} ${set.box.h}` }]
+    ).map((set) => (
+      <svg
+        class:list={['bunting__svg', set.cls]}
+        viewBox={set.vb}
+        role="presentation"
+        focusable="false"
+      >
+        {set.strands.map((s) => (
+          <g>
+            {s.flags.map((f) => (
+              <g class="bunting__flag" style={`--i:${f.i}`}>
+                <polygon points={f.points} fill={f.fill}></polygon>
+                <polygon class="bunting__shade" points={f.shade}></polygon>
+              </g>
+            ))}
+            <path class="bunting__cord" d={s.cord} fill="none" vector-effect="non-scaling-stroke"></path>
+          </g>
+        ))}
+      </svg>
+    ))}
+  </div>
+)}
+
+<style>
+  /* ---- strip ---- */
+  .banderitas { display: block; width: 100%; height: 22px; }
+  .banderitas--flip { transform: scaleY(-1); }
+
+  /* ---- overlay host contract ---- */
+  :global(:has(> .bunting)) {
+    position: relative;
+    overflow-x: clip;
+  }
+  /* Artboard h / w — narrow here, wide in the media query. */
+  :global(:has(> .bunting--swags)) { --bunting-drop: calc(100vw * 78 / 360); }
+  :global(:has(> .bunting--canopy)) { --bunting-drop: calc(100vw * 96 / 360); }
+  :global(:has(> .bunting--street)) { --bunting-drop: calc(100vw * 74 / 360); }
+  @media (min-width: 48em) {
+    /* Each corner is half the artboard (720 x 150), capped at 50rem. */
+    :global(:has(> .bunting--swags)) { --bunting-drop: calc(min(50vw, 50rem) * 150 / 720); }
+    :global(:has(> .bunting--canopy)) { --bunting-drop: calc(100vw * 210 / 1440); }
+    :global(:has(> .bunting--street)) { --bunting-drop: calc(100vw * 130 / 1440); }
+  }
+
+  /* ---- overlay ---- */
+  .bunting {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: var(--bunting-drop);
+    z-index: 1;
+    pointer-events: none;
+  }
+  /* Clipped: the tie points sit outside the artboard on purpose. */
+  .bunting__svg { position: absolute; top: 0; left: 0; display: block; width: 100%; height: auto; overflow: hidden; }
+  /* Swags: one SVG per corner, each at most 50rem wide (their size on a
+     1600px screen), anchored to its own corner. */
+  .bunting--swags .bunting__svg { width: min(50%, 50rem); }
+  .bunting--swags .bunting__svg--right { left: auto; right: 0; }
+  /* The fold: a darker half gives each pennant a little body. */
+  .bunting__shade { fill: rgb(0 0 0 / 0.14); }
+
+  .bunting__svg--wide { display: none; }
+  @media (min-width: 48em) {
+    .bunting__svg--wide { display: block; }
+    .bunting__svg--narrow { display: none; }
+  }
+
+  .bunting__cord { stroke-width: 1.5; }
+  .bunting--dark .bunting__cord { stroke: color-mix(in srgb, var(--color-text-inverse) 55%, transparent); }
+  .bunting--light .bunting__cord { stroke: var(--color-border-strong); }
+
+  /* One settle on load, each pennant swinging from its top edge, staggered
+     along the strand. Nothing loops — motion beside an order CTA should
+     stop before anyone reads the button. */
+  .bunting--sway .bunting__flag {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    animation: bunting-settle 1.8s cubic-bezier(0.25, 0.8, 0.35, 1) both;
+    animation-delay: calc(var(--i) * 45ms);
+  }
+  @keyframes bunting-settle {
+    0%   { transform: rotate(9deg); }
+    35%  { transform: rotate(-5deg); }
+    60%  { transform: rotate(2.5deg); }
+    80%  { transform: rotate(-1deg); }
+    100% { transform: rotate(0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bunting--sway .bunting__flag { animation: none; }
+  }
+</style>

@@ -1,0 +1,173 @@
+---
+import site from '../data/site.json';
+
+interface Props {
+  /** The contact page expands each step with a little more detail. */
+  expanded?: boolean;
+  headingLevel?: 'h2' | 'h3';
+  /** Sit on the toasted band (home page rhythm). */
+  band?: boolean;
+}
+const { expanded = false, headingLevel = 'h2', band = false } = Astro.props as Props;
+
+const steps = [
+  {
+    h: 'Message us',
+    p: 'Tap the button and send us a message on Facebook.',
+    more: `Every order goes through ${site.ordering.channel}. There is no order form on this site — messaging us is how you start.`,
+  },
+  {
+    h: 'Tell us your details',
+    p: 'Your event date, how many guests, and your delivery address.',
+    more: "If you're not sure what size you need, just tell us the pax count and we'll work it out with you.",
+  },
+  {
+    h: 'We confirm',
+    p: "We'll recommend a size and confirm your date, then send payment details.",
+    more: 'Wait for this confirmation before sending any payment. Your date is not reserved until we confirm it.',
+  },
+  {
+    h: 'We deliver',
+    p: `Free within ${site.location.locality}, on your date.`,
+    more: site.delivery.outsideNote,
+  },
+];
+
+const H = headingLevel;
+const StepH = headingLevel === 'h2' ? 'h3' : 'h4';
+---
+
+<section class:list={['section wrap', band && 'band--sunken']} id="order">
+  <header class="shead">
+    <p class="eyebrow">How to order</p>
+    <H class="h2">Four steps, all on Messenger</H>
+  </header>
+
+  {/*
+    Numbered steps; each number lights up in turn as you scroll to it.
+    A 2x2 grid on phones and tablets, read in normal order (1 2 / 3 4), a
+    row of four on desktop. No connecting lines. CSS scroll-driven animations only;
+    the default (no support, or reduced motion) is every number lit.
+    Step text never dims.
+  */}
+  <ol class="steps">
+    {steps.map((s, i) => (
+      <li class="step" style={`--i:${i}`}>
+        <span class="step__n" aria-hidden="true">{i + 1}</span>
+        <div class="step__body">
+          <StepH class="step__h">{s.h}</StepH>
+          <p class="step__p">{s.p}</p>
+          {expanded && <p class="step__p">{s.more}</p>}
+        </div>
+      </li>
+    ))}
+  </ol>
+
+  <p class="hto__lead"><span class="leadtime">{site.ordering.leadTimeLong}</span></p>
+</section>
+
+<style>
+  /* ---- Phones and tablets: 2x2 grid ----
+     Each step is centred in its cell — number, title, text. The grid and
+     the lead-time note below it share one width (--hto-w), so their edges
+     line up: full width on phones, one centred 30rem column on tablets. */
+  .steps,
+  .hto__lead {
+    --hto-w: 30rem;
+    width: min(100%, var(--hto-w));
+    margin-inline: auto;
+  }
+  .steps {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8) var(--space-4);
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 1fr;
+    /* Shorter steps are stretched to the row's height; keep their extra
+       space at the bottom so both titles in a row sit on one line. */
+    align-content: start;
+    justify-items: center;
+    row-gap: var(--space-3);
+    text-align: center;
+  }
+
+  .step__n {
+    position: relative;
+    z-index: 1;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--color-cta);
+    background: var(--color-cta);
+    color: var(--color-cta-text);
+    font-family: var(--font-display);
+    font-weight: var(--weight-black);
+    font-size: var(--text-base);
+  }
+  .step__h { font-size: var(--text-lg); font-weight: var(--weight-bold); line-height: var(--leading-tight); }
+  .step__p { margin-top: var(--space-1); font-size: var(--text-sm); color: var(--color-text-muted); }
+
+  /* ---- Desktop: a row of four ---- */
+  @media (min-width: 56em) {
+    .steps {
+      width: auto;
+      grid-template-columns: repeat(4, 1fr);
+      column-gap: var(--space-6);
+    }
+    .step { row-gap: var(--space-4); }
+    .step__body { max-width: 16rem; }
+    .step__p { font-size: var(--text-base); }
+  }
+
+  /* ---- Scroll-driven lighting ----
+     One timing at every size, on the grid's own scroll: number i lights
+     at 30vh + i x 12vh as the grid rises from 70% to 34% of the viewport,
+     so the numbers light 1, 2, 3, 4 in order whatever the layout.
+
+     The timeline and range sit in their own rule (.step > …), apart from
+     the animation name: the CSS minifier folds a rule's animation
+     longhands into one `animation` shorthand, and a shorthand carrying a
+     scroll timeline is invalid in Chrome, which then drops the whole
+     declaration. Kept separate, they survive minification. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .steps { view-timeline: --hto block; }
+      .step__n { animation: hto-node linear both; }
+      .step > .step__n {
+        animation-timeline: --hto;
+        animation-range:
+          entry calc(30vh + var(--i) * 12vh)
+          entry calc(32vh + var(--i) * 12vh);
+      }
+    }
+  }
+  /* Unlit: an outlined node on the page ground. Lit: the red CTA fill. */
+  @keyframes hto-node {
+    from {
+      background: var(--surface);
+      border-color: var(--color-border-strong);
+      color: var(--color-text-muted);
+      scale: 0.88;
+    }
+    to {
+      background: var(--color-cta);
+      border-color: var(--color-cta);
+      color: var(--color-cta-text);
+      scale: 1;
+    }
+  }
+
+  .hto__lead { margin-top: var(--space-10, 2.5rem); text-align: center; }
+  /* The note fills the shared width, so its edges meet the steps'. */
+  .hto__lead .leadtime { display: flex; text-wrap: balance; justify-content: center; }
+  @media (min-width: 56em) {
+    .hto__lead { width: auto; }
+    .hto__lead .leadtime { display: inline-flex; }
+  }
+</style>

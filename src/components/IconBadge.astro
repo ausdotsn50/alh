@@ -1,0 +1,126 @@
+---
+/**
+ * IconBadge — flat, single-stroke line icons on a solid circle, inspired by
+ * panlasangpinoy.com's "Top Categories" row (a Panlasang Pinoy site, used
+ * here for style reference only — nothing on this page is copied from it).
+ *
+ * Hand-drawn inline SVG, same approach as Banderitas.astro: no icon library
+ * dependency, no stock art. Colors come only from tokens already in the
+ * locked Fiesta palette (tokens.css) — no new hex, no new colors added.
+ *
+ * `tone="on-dark"` is for placement on the red ground (e.g. Occasions):
+ * gold circle, dark stroke. `tone="on-light"` is for the cream page
+ * background (e.g. Why Alzar's): soft-gold circle, strong-gold stroke.
+ */
+export type IconName =
+  | 'cake'      // Birthdays
+  | 'fan'       // Fiesta — abaniko / hand fan, a real Filipino fiesta motif
+  | 'people'    // Reunions
+  | 'drop'      // Binyag — baptism
+  | 'rings'     // Kasal — wedding
+  | 'star'      // Pasko at Bagong Taon — parol star
+  | 'flame'     // Wood-fired
+  | 'calendar'  // Roasted for your date
+  | 'pin'       // Free delivery
+  | 'bowl';     // Dinuguan freebie
+
+interface Props {
+  name: IconName;
+  tone?: 'on-dark' | 'on-light';
+}
+const { name, tone = 'on-light' } = Astro.props as Props;
+---
+
+<span class:list={['iconbadge', `iconbadge--${tone}`]} aria-hidden="true">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    {name === 'cake' && (
+      <>
+        <path d="M4 12.5h16v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6Z" />
+        <path d="M4 12.5c0-1.5 1.5-1.8 1.5-3S4 7.5 4 6" />
+        <path d="M20 12.5c0-1.5-1.5-1.8-1.5-3S20 7.5 20 6" />
+        <path d="M12 12.5c0-1.5-1.5-1.8-1.5-3s1.5-2 1.5-3.5" />
+        <path d="M12 3v1.2" />
+      </>
+    )}
+    {name === 'fan' && (
+      <>
+        <path d="M12 20c-3-3-7-4-7-8a7 7 0 0 1 14 0c0 4-4 5-7 8Z" />
+        <path d="M12 20V9" />
+        <path d="M8.5 11 12 9l3.5 2" />
+        <path d="M7 14l5-2 5 2" />
+      </>
+    )}
+    {name === 'people' && (
+      <>
+        <circle cx="8.5" cy="8.5" r="2.5" />
+        <circle cx="16" cy="9.5" r="2" />
+        <path d="M4 19c0-2.8 2-5 4.5-5s4.5 2.2 4.5 5" />
+        <path d="M13.5 19c0-2.2 1.4-4 3.5-4s3.5 1.8 3.5 4" />
+      </>
+    )}
+    {name === 'drop' && (
+      <path d="M12 3c3 4 6 7.5 6 11a6 6 0 0 1-12 0c0-3.5 3-7 6-11Z" />
+    )}
+    {name === 'rings' && (
+      <>
+        <circle cx="9" cy="14" r="4.2" />
+        <circle cx="15" cy="14" r="4.2" />
+      </>
+    )}
+    {name === 'star' && (
+      <path d="M12 2.5c.6 3 1.6 5 3.5 6.5 2 1.5 4 2 6 2.5-2 .8-4 1.4-6 3-1.8 1.4-2.9 3.4-3.5 6.5-.6-3-1.7-5.1-3.5-6.5-2-1.6-4-2.2-6-3 2-.5 4-1 6-2.5 1.9-1.5 2.9-3.5 3.5-6.5Z" />
+    )}
+    {name === 'flame' && (
+      <path d="M12 21c-3.3 0-6-2.4-6-5.8 0-2.6 1.7-4 2.6-5.9.4 1 .3 2 1 2.5.2-2.6 1-5 3.2-6.8.4 2 .2 3.6 1.4 5.3.8 1.1 2.3 2 2.3 4.9 0 3.4-2.6 5.8-4.5 5.8Z" />
+    )}
+    {name === 'calendar' && (
+      <>
+        <rect x="4" y="5" width="16" height="15" rx="2" />
+        <path d="M4 9.5h16" />
+        <path d="M8 3v3.5M16 3v3.5" />
+        <path d="M9.5 14.2l1.8 1.8 3.2-3.4" />
+      </>
+    )}
+    {name === 'pin' && (
+      <>
+        <path d="M12 21s7-6.3 7-11.5a7 7 0 0 0-14 0C5 14.7 12 21 12 21Z" />
+        <circle cx="12" cy="9.5" r="2.3" />
+      </>
+    )}
+    {name === 'bowl' && (
+      <>
+        <path d="M3.5 12h17a1 1 0 0 1 1 1.1c-.4 3.7-3.7 6.4-9.5 6.4s-9.1-2.7-9.5-6.4a1 1 0 0 1 1-1.1Z" />
+        <path d="M9.5 9c-.5-1-.2-1.8.4-2.6M13 8.3c-.4-1-.1-1.7.5-2.5" />
+      </>
+    )}
+  </svg>
+</span>
+
+<style>
+  .iconbadge {
+    display: inline-grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    flex: none;
+  }
+  .iconbadge svg { width: 1.5rem; height: 1.5rem; }
+
+  /* On red ground (Occasions): gold circle, dark stroke — gold already
+     carries the contrast/legibility work on red elsewhere on this site. */
+  .iconbadge--on-dark {
+    background: var(--color-accent);
+    color: var(--color-text-on-accent);
+  }
+
+  /* On cream ground (Why Alzar's): soft tint circle, red stroke. Gold on
+     the soft-gold tint only reaches ~2.5:1 — a thin icon stroke needs the
+     3:1 WCAG floor for graphical objects that --color-accent-strong is
+     rated for at text sizes, not at 1.7px line weight. Red on the tint
+     measures 5.8:1. */
+  .iconbadge--on-light {
+    background: var(--color-accent-soft);
+    color: var(--color-cta);
+  }
+</style>
