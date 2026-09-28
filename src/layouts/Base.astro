@@ -46,5 +46,19 @@ const { title, description, ogImage, schema } = Astro.props as Props;
       <slot />
     </main>
     <Footer />
+
+    <script>
+      /* Messenger and Facebook links carry target="_blank" so desktop
+         opens them in a new tab. On touch devices, open them in the same
+         tab instead: iOS Universal Links and Android App Links hand an
+         m.me / facebook.com link to the Messenger or Facebook app most
+         reliably from a same-tab tap, and a new tab often keeps people in
+         the browser's web version. Without JS they keep the new tab. */
+      if (window.matchMedia('(pointer: coarse)').matches) {
+        document
+          .querySelectorAll('a[href^="https://m.me/"], a[href*="facebook.com"]')
+          .forEach((a) => a.removeAttribute('target'));
+      }
+    </script>
   </body>
 </html>
